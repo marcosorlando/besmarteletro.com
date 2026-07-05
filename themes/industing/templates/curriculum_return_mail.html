@@ -1,0 +1,28 @@
+<table width="550" style="font-family: 'Tahoma', sans-serif">
+	<tr>
+		<td>
+			<p>{saudacao}</b></p>
+			<p>{full_name}, este e-mail é para informar que recebemos seu currículo, o mesmo ficará cadastrado em
+				nosso Banco de Currículos, assim que surgir alguma oferta de emprego na área que você escolheu,
+				entraremos	em contato por e-mail e/ou telefone.</p>
+			<p>Obrigado!</p>
+			
+			<p style="font-size: 1em">
+				<img src="{INCLUDE_PATH}/images/logo-color.png" alt="Atenciosamente, {SITE_NAME}" title="Atenciosamente, {SITE_NAME}"/>
+				<br><br>
+				{SITE_ADDR_NAME}<br>
+				Telefone:<b> {SITE_ADDR_PHONE_A}</b><br>
+				E-mail: {SITE_ADDR_EMAIL}<br><br>
+				Visite nosso site: <a title="{SITE_NAME}" href="{BASE}">{SITE_ADDR_SITE}</a><br>
+			</p>
+		</td>
+	</tr>
+</table>
+<style>body, img {
+	max-width: 550px !important;
+	height: auto !important;
+}
+
+p {
+	margin-botton: 15px 0 !important;
+}</style>

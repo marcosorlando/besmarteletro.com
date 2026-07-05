@@ -1,0 +1,140 @@
+<style>
+	
+	*, *:after, *:before {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		font-family: 'Ubuntu', Verdana, Arial, Helvetica, sans-serif;
+	}
+	
+	body {
+		width: 100vw;
+		height: 100vh;
+		background: var(--page-bg-color);
+	}
+	
+	.header-logo {
+		height: 18vh;
+		background: #f2f2f2;
+		text-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.header-logo img {
+		height: 80px;
+		width: auto;
+	}
+	
+	.page-content {
+		height: 82vh;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		position: relative;
+		overflow: hidden;
+		
+	}
+	
+	.page_cover {
+		opacity: 0.6;
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: auto;
+		clear: both;
+	}
+	
+	.page-title {
+		font-size: 4em;
+		text-align: center;
+		color: var(--page-subtitle-color);
+		z-index: 5;
+	}
+	
+	.page-text {
+		font-size: 1.2em;
+		text-align: center;
+		color: var(--page-complement-color);
+		z-index: 5;
+	}
+	
+	.page-btn {
+		background-color: var(--page-btn-bg-color);
+		color: var(--page-btn-text-color) !important;
+		padding: 1em 1.4em;
+		font-size: 1.5em;
+		font-weight: 700;
+		border-radius: 12px;
+		letter-spacing: 1px;
+		box-shadow: inset 0px 0px 8px 5px rgba(0, 0, 0, 0.1);
+		z-index: 5;
+		text-decoration: none;
+		text-align: center;
+	}
+	
+	.page-btn:hover {
+		background-color: var(--page-btn-bg-color-hover);
+		box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.15), inset 0px 0px 8px 8px rgba(0, 0, 0, 0.1);
+	}
+	
+	
+	.page-btn:before {
+		margin-right: 6px
+	}
+	
+	.page-footer {
+		width: 100%;
+		height: 100px !important;
+		padding: 10px;
+		background-color: var(--page-footer-color);
+		padding: 10px;
+		text-align: center;
+	}
+	
+	.page-footer .footer-logo {
+		height: 30px !important;
+		width: auto;
+	}
+
+</style>
+<body>
+<script>
+	fbq('track', 'Lead');
+</script>
+<section>
+	<header class="header-logo">
+		<img src="{page_logo}"
+		     alt="{alt_logo}">
+	
+	</header>
+	<article class="page-content">
+		{page_cover}
+		<h1 class="page-title">
+			{page_title}
+		</h1>
+		
+		<div class="page-text">
+			{page_text_complement}
+		</div>
+		
+		<a class="page-btn" href="{page_pdf}" target="_blank" title="Clique e receba seu arquivo.">
+			<b>{page_btn_icon}</b>
+			{page_btn_text}
+		</a>
+	</article>
+	
+	<footer class="page-footer">
+		<p>{copyright}</p>
+		<img class="footer-logo" src="{page_logo}" alt="{alt_logo}"/>
+	</footer>
+</section>
+</body>
+
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:400,700" rel="stylesheet">
+<script> fbq('track', '{page_event}');</script>

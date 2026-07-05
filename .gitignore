@@ -1,0 +1,59 @@
+# IDEs e arquivos de sistema
+.idea/
+.idea/*
+.claude
+.DS_Store
+/.env
+.vscode/
+.editorconfig
+Thumbs.db
+.htaccess
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+error_log
+
+# Arquivos de ambiente e segurança
+.env
+phpinfo.php
+.php-cs-fixer.cache
+.php-cs-fixer.php
+arvore-do-projeto.txt
+phpstan.neon.dist
+phpcs.xml
+phpunit.xml
+tim.old.php
+rector.php
+bin
+
+# Composer
+/vendor/
+composer.phar
+composer.lock
+composerDEV.json
+
+var
+
+# Uploads e imagens dinâmicas
+/uploads/
+uploads/
+uploads/images/**/cache/*
+!uploads/images/**/cache/.gitkeep
+
+# Sitemap (gerado dinamicamente ou por script)
+admin/sitemap.txt
+sitemap.xml
+sitemap.xml.gz
+sitemap.xsl
+
+# Cache geral
+cache
+/cache/*
+!cache/.gitkeep
+
+#Deployments e builds
+deploy-ftp.env

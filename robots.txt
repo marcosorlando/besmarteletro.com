@@ -1,0 +1,11 @@
+User-Agent: *
+Allow: /
+Disallow: /_app/
+Disallow: /admin/
+Disallow: /cache/
+Disallow: /site-antigo/
+Disallow: /site-antigo/curriculos/
+User-agent: Bingbot
+Disallow: /site-antigo/
+Disallow: /site-antigo/curriculos/
+Disallow: /site-antigo/curriculos/ALESSANDRO%20SANTOS%20MONTANES_6287b954789a1.docx

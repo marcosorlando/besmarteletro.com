@@ -1,0 +1,208 @@
+<style>
+	
+	*, *:after, *:before {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		font-family: 'Ubuntu', Verdana, Arial, Helvetica, sans-serif;
+	}
+	
+	body {
+		width: 100vw;
+		height: auto;
+		background-color: #bf0712;
+		background-image: linear-gradient(160deg, #bf0712 0%, #06173a 92%);
+		
+	}
+	
+	.header-logo {
+		height: 100px;
+		background: #f2f2f2;
+		text-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.header-logo img {
+		height: 70px;
+		width: auto;
+	}
+	
+	.page-content {
+		padding: 70px 0;
+		height: auto;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		position: relative;
+		overflow: hidden;
+	}
+	
+	figure.carduser_thumb img {
+		display: block;
+		width: 150px;
+		height: 150px;
+		margin: 0 auto;
+		border-radius: 50%;
+		border: 4px outset #cccccc;
+	}
+	
+	.carduser_name {
+		font-size: 1.5em;
+		text-align: center;
+		color: var(--page-subtitle-color);
+	}
+	
+	.carduser_cargo {
+		font-size: 1.2em;
+		text-align: center;
+		color: var(--page-subtitle-color);
+	}
+	
+	.carduser_email {
+		font-size: 1.05em;
+		font-weight: 400;
+		text-align: center;
+		color: var(--page-subtitle-color);
+		margin-bottom: 30px;
+	}
+	.carduser_email a{color: #268df2; transition: color ease-in .5s}
+	.carduser_email a:hover{color: #1e4ef7; transition: color ease-in .5s}
+	
+	.carduser_btn {
+		background-color: var(--page-btn-bg-color);
+		color: var(--page-btn-text-color) !important;
+		width: 400px;
+		max-width: 80%;
+		padding: 12px 30px;
+		font-size: 1em;
+		font-weight: 600;
+		border-radius: 50px;
+		letter-spacing: 1px;
+		box-shadow: inset 0px 0px 8px 5px rgba(0, 0, 0, 0.1);
+		text-decoration: none;
+		text-align: center;
+		border: 2px solid #FFFFFF;
+		margin: 8px 0;
+		
+	}
+	
+	.carduser_btn:hover {
+		background-color: var(--page-btn-bg-color-hover);
+		box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.15), inset 0px 0px 8px 8px rgba(0, 0, 0, 0.1);
+	}
+	
+	.carduser_btn:before {
+		margin-right: 6px
+	}
+	
+	.page-footer {
+		width: 100%;
+		height: 100px !important;
+		padding: 10px;
+		background-color: var(--page-footer-color);
+		padding: 10px;
+		text-align: center;
+	}
+	
+	.page-footer .footer-logo {
+		height: 30px !important;
+		width: auto;
+	}
+	
+	ul.social_media {
+		width: 400px;
+		max-width: 80%;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 10px;
+	}
+	
+	.social_media li {
+		width: 40px;
+		margin: 8px;
+		list-style: none;
+	}
+	
+	.social_media li a {
+		text-decoration: none;
+		width: 45px;
+		height: 45px;
+		text-align: center;
+		border: 1px solid #FFFFFF;
+		border-radius: 50%;
+		padding: 8px 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #FFFFFF;
+	}
+	
+	.social_media li a i:before{
+		margin: 0;
+		padding: 0;
+	}
+	
+	.social_media li a:hover {
+		background-color: #0291ed;
+		border: 1px solid #0291ed;
+		transition: all ease .6s;
+	}
+	
+	.rdstation-popup-position-bottom_right{
+		display: none !important;
+	}
+
+</style>
+<body>
+<section style="background: url('{background}') no-repeat center center; background-size: cover">
+	<header class="header-logo">
+		<img src="{page_logo}"
+		     alt="{alt_logo}">
+	
+	</header>
+	<article class="page-content">
+		
+		<figure class="carduser_thumb">
+			{carduser_thumb}
+		</figure>
+		
+		<h1 class="carduser_name">
+			{carduser_name} {carduser_lastname}
+		</h1>
+		
+		<h2 class="carduser_cargo">
+			{carduser_cargo}
+		</h2>
+		
+		<h3 class="carduser_email">
+			{carduser_email}
+		</h3>
+		
+		{carduser_whatsapp}
+		
+		{website}
+		{sobre}
+		{cotacao}
+		{catalogo}
+		{map}
+		
+		<ul class="social_media">{social_media}</ul>
+		
+	</article>
+	
+	<footer class="page-footer">
+		<p>{copyright}</p>
+		<img class="footer-logo" src="{page_logo}" alt="{alt_logo}"/>
+	</footer>
+</section>
+</body>
+
+<link href="https://fonts.googleapis.com/css?family=Ubuntu:400,700" rel="stylesheet">
+<script> fbq('track', '{page_event}');</script>

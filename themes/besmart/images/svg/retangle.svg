@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16.09 10.54">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #201f1d;
+        mix-blend-mode: multiply;
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        isolation: isolate;
+      }
+    </style>
+  </defs>
+  <g class="cls-2">
+    <g id="Camada_2" data-name="Camada 2">
+      <g id="Header">
+        <rect class="cls-1" width="16.09" height="10.54"/>
+      </g>
+    </g>
+  </g>
+</svg>
