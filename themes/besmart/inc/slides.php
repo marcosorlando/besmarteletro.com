@@ -1,16 +1,16 @@
 <?php
 
-	$Read->FullRead("SELECT slide_image_mobile, slide_image_tablet, slide_image_desktop, slide_link_banner, slide_title, slide_desc, slide_complement,slide_category, slide_product, slide_link_pdt, slide_link_pdt_btn, slide_link_cat, slide_link_cat_btn, show_title, show_desc, show_complement FROM " . DB_SLIDES . " WHERE slide_status = :status AND slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL) ORDER BY slide_date DESC",
+	$Read->fullRead("SELECT slide_image_mobile, slide_image_tablet, slide_image_desktop, slide_link_banner, slide_title, slide_desc, slide_complement,slide_category, slide_product, slide_link_pdt, slide_link_pdt_btn, slide_link_cat, slide_link_cat_btn, show_title, show_desc, show_complement FROM " . DB_SLIDES . " WHERE slide_status = :status AND slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL) ORDER BY slide_date DESC",
 		"status=1");
 
-	if ($Read->getResult()):
+	if ($Read->getResult()) {
 
 		?>
 		<section class="carousel container">
 			<div class="content">
 				<div class="owl-carousel owl-theme">
 					<?php
-						foreach ($Read->getResult() as $SLIDE):
+						foreach ($Read->getResult() as $SLIDE) {
 							$image_desktop = $SLIDE['slide_image_desktop'];
 							$image_mobile = (!empty($SLIDE['slide_image_mobile']) ? $SLIDE['slide_image_mobile'] : $image_desktop);
 							$image_tablet = (!empty($SLIDE['slide_image_tablet']) ? $SLIDE['slide_image_tablet'] : $image_desktop);
@@ -57,12 +57,12 @@
 								</div>
 							</div>
 						<?php
-						endforeach;
+						}
 					?>
 				</div>
 				<div class="clear"></div>
 			</div>
 		</section>
 	<?php
-	endif;
+	}
 ?>

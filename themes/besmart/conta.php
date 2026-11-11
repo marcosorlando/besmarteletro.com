@@ -1,7 +1,7 @@
 <?php
-if (!ACC_MANAGER):
+if (!ACC_MANAGER) {
     require REQUIRE_PATH . '/404.php';
-else:
+} else {
     ?>
     <div class="container" id="acc">
         <div class="content" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; padding: 40px 0 50px 0;">
@@ -10,4 +10,4 @@ else:
         </div>
     </div>
 <?php
-endif;
+}

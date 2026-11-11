@@ -1,40 +1,39 @@
 <?php
 
-	$AdminLevel = LEVEL_WC_SLIDES;
-	if (!APP_SLIDE || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-		die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-	endif;
+use App\Conn\Create;
+use App\Conn\Read;
 
-	// AUTO INSTANCE OBJECT READ
-	if (empty($Read)):
-		$Read = new Read;
-	endif;
+$AdminLevel = LEVEL_WC_SLIDES;
+if (!APP_SLIDE || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
 
-	// AUTO INSTANCE OBJECT CREATE
-	if (empty($Create)):
-		$Create = new Create;
-	endif;
+$Read = new Read();
+$Create = new Create();
 
-	$SlideId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-	if ($SlideId):
-		$Read->ExeRead(DB_SLIDES, "WHERE slide_id = :id", "id={$SlideId}");
-		if ($Read->getResult()):
-			$FormData = array_map('htmlspecialchars', $Read->getResult()[0]);
-			extract($FormData);
-		else:
-			$_SESSION['trigger_controll'] = "<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um slide que não existe ou que foi removido recentemente!";
-			header('Location: dashboard.php?wc=slide/home');
-			exit;
-		endif;
-	else:
-		$SlideCreate = [
-			'slide_date' => date('Y-m-d H:i:s'),
-			'slide_start' => date('Y-m-d H:i:s')
-		];
-		$Create->ExeCreate(DB_SLIDES, $SlideCreate);
-		header('Location: dashboard.php?wc=slide/create&id=' . $Create->getResult());
-		exit;
-	endif;
+$SlideId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if ($SlideId) {
+    $Read->exeRead(DB_SLIDES, 'WHERE slide_id = :id', 'id=' . $SlideId);
+    if ($Read->getResult()) {
+        $FormData = array_map(
+            fn($v) => htmlspecialchars((string)(is_scalar($v) ? $v : ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+            $Read->getResult()[0]
+        );
+        extract($FormData);
+    } else {
+        $_SESSION['trigger_controll'] = "<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um slide que não existe ou que foi removido recentemente!";
+        header('Location: dashboard.php?wc=slide/home');
+        exit;
+    }
+} else {
+    $SlideCreate = [
+        'slide_date' => date('Y-m-d H:i:s'),
+        'slide_start' => date('Y-m-d H:i:s'),
+    ];
+    $Create->exeCreate(DB_SLIDES, $SlideCreate);
+    header('Location: dashboard.php?wc=slide/create&id=' . $Create->getResult());
+    exit;
+}
 ?>
 
 <header class="dashboard_header">

@@ -1,19 +1,24 @@
 <?php
+
+use App\Conn\Delete;
+use App\Conn\Read;
+use App\Helpers\Check;
+
 $AdminLevel = LEVEL_WC_PRODUCTS;
-if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-    die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-endif;
+if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
 
 // AUTO INSTANCE OBJECT READ
-if (empty($Read)):
-    $Read = new Read;
-endif;
+if (empty($Read)) {
+    $Read ??= new Read();
+}
 
 //AUTO DELETE POST TRASH
-if (DB_AUTO_TRASH):
-    $Delete = new Delete;
-    $Delete->ExeDelete(DB_PDT_BRANDS, "WHERE brand_title IS NULL AND brand_id >= :st", "st=1");
-endif;
+if (DB_AUTO_TRASH) {
+    $Delete ??= new Delete();
+    $Delete->exeDelete(DB_PDT_BRANDS, "WHERE brand_title IS NULL AND brand_id >= :st", "st=1");
+}
 ?>
 
 <header class="dashboard_header">
@@ -37,12 +42,12 @@ endif;
 
 <div class="dashboard_content">
     <?php
-    $Read->ExeRead(DB_PDT_BRANDS, "ORDER By brand_title ASC");
-    if (!$Read->getResult()):
-        echo Erro("<span class='al_center icon-notification'>Ainda não existem marcas ou fabricantes cadastradas {$Admin['user_name']}. Comece agora mesmo criando suas marcas e fabricantes de produtos!</span>", E_USER_NOTICE);
-    else:
-        foreach ($Read->getResult() as $Brand):
-            $Read->FullRead("SELECT count(pdt_id) as total FROM " . DB_PDT . " WHERE pdt_brand = :brand", "brand={$Brand['brand_id']}");
+    $Read->exeRead(DB_PDT_BRANDS, "ORDER By brand_title ASC");
+    if (!$Read->getResult()) {
+        echo Check::erro("<span class='al_center icon-notification'>Ainda não existem marcas ou fabricantes cadastradas {$Admin['user_name']}. Comece agora mesmo criando suas marcas e fabricantes de produtos!</span>", E_USER_NOTICE);
+    } else {
+        foreach ($Read->getResult() as $Brand) {
+            $Read->fullRead("SELECT count(pdt_id) as total FROM " . DB_PDT . " WHERE pdt_brand = :brand", "brand={$Brand['brand_id']}");
             $TotalPdtBrand = $Read->getResult()[0]['total'];
             echo "<article class='product_brand box box100' id='{$Brand['brand_id']}'>
             <div class='box_content'>
@@ -53,7 +58,7 @@ endif;
                 <span rel='product_brand' callback='Products' callback_action='brand_remove' class='j_delete_action_confirm btn btn_yellow icon-warning' style='display: none;' id='{$Brand['brand_id']}'>Deletar Fabricante?</span>
             </div>
         </article>";
-        endforeach;
-    endif;
+        }
+    }
     ?>
 </div>

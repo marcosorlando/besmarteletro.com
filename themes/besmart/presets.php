@@ -1,8 +1,8 @@
 <?php
 
 // Colors
-$Read->ExeRead(DB_TEMPLATE_COLORS, 'WHERE color_status = :status', "status=1");
-if ($Read->getResult()):
+$Read->exeRead(DB_TEMPLATE_COLORS, 'WHERE color_status = :status', "status=1");
+if ($Read->getResult()) {
 
 	    // Background Color
     $colorBackgroundOne = $Read->getResult()[0]['color_background_one'];
@@ -20,7 +20,7 @@ if ($Read->getResult()):
     $colorBackgroundTwoOpacity = $Read->getResult()[0]['color_background_two'] . 'e6';
     $colorBackgroundThreeOpacity = $Read->getResult()[0]['color_background_three'] . 'e6';
     $colorBackgroundFourOpacity = $Read->getResult()[0]['color_background_four'] . 'e6';
-else:
+} else {
     // Background Color
     $colorBackgroundOne = '#5a2d82';
     $colorBackgroundTwo = '#7838a8';
@@ -38,7 +38,7 @@ else:
     $colorTextTwo = '#7838a8';
     $colorTextThree = '#36ba9b';
     $colorTextFour = '#f5f5f5';
-endif;
+}
 ?>
 
 <style>

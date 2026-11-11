@@ -1,36 +1,41 @@
 <?php
+
+use App\Conn\Create;
+use App\Conn\Read;
+use App\Helpers\Check;
+
 $AdminLevel = LEVEL_WC_PRODUCTS;
-if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-    die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-endif;
+if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
 
 // AUTO INSTANCE OBJECT READ
-if (empty($Read)):
-    $Read = new Read;
-endif;
+if (empty($Read)) {
+    $Read ??= new Read();
+}
 
 // AUTO INSTANCE OBJECT CREATE
-if (empty($Create)):
-    $Create = new Create;
-endif;
+if (empty($Create)) {
+    $Create ??= new Create();
+}
 
 $CouponId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if ($CouponId):
-    $Read->ExeRead(DB_PDT_COUPONS, "WHERE cp_id = :id", "id={$CouponId}");
-    if ($Read->getResult()):
-        $FormData = array_map('htmlspecialchars', $Read->getResult()[0]);
+if ($CouponId) {
+    $Read->exeRead(DB_PDT_COUPONS, "WHERE cp_id = :id", "id={$CouponId}");
+    if ($Read->getResult()) {
+        $FormData = array_map(static fn($value) => Check::safeHtmlChars($value), $Read->getResult()[0]);
         extract($FormData);
-    else:
-        $_SESSION['trigger_controll'] = Erro("<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um cupom de desconto que não existe ou que foi removido recentemente!", E_USER_NOTICE);
+    } else {
+        $_SESSION['trigger_controll'] = Check::erro("<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um cupom de desconto que não existe ou que foi removido recentemente!", E_USER_NOTICE);
         header('Location: dashboard.php?wc=products/coupons');
         exit;
-    endif;
-else:
+    }
+} else {
     $CarCreate = ['cp_start' => date("Y-m-d H:i:s"), 'cp_end' => date("Y-m-d H:i:s", strtotime("+30day"))];
-    $Create->ExeCreate(DB_PDT_COUPONS, $CarCreate);
+    $Create->exeCreate(DB_PDT_COUPONS, $CarCreate);
     header('Location: dashboard.php?wc=products/coupon&id=' . $Create->getResult());
     exit;
-endif;
+}
 ?>
 
 <header class="dashboard_header">

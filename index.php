@@ -190,29 +190,9 @@
 			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/widgets/filter/filter.min.css"/>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"/>
 
+
+			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/style.min.css'/>
 			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/_css/responsive.min.css'/>
-
-            <?php
-                // MAIN STYLE THEME
-                if (file_exists('themes/' . $_SESSION['WC_THEME'] . '/style.css')) {
-                    echo '<link rel="stylesheet" href="' . $_SESSION['INCLUDE_PATH'] . '/style.min.css"/>' . "\r\n";
-                }
-
-                //WC THEME CSS FILES
-                /*    if (file_exists('themes/' . $_SESSION['WC_THEME'] . '/_css')) {
-                        foreach (scandir('themes/' . $_SESSION['WC_THEME'] . '/_css') as $wcCssThemeFiles) {
-                            if (
-                                file_exists('themes/' . $_SESSION['WC_THEME'] . "/_css/{$wcCssThemeFiles}") && !is_dir(
-                                    'themes/' . $_SESSION['WC_THEME'] . "/_css/{$wcCssThemeFiles}"
-                                ) && pathinfo(
-                                    'themes/' . $_SESSION['WC_THEME'] . "/_css/{$wcCssThemeFiles}"
-                                )['extension'] == 'css'
-                            ) {
-                                echo '<link rel="stylesheet" href="' . $_SESSION['INCLUDE_PATH'] . '/_css/' . $wcCssThemeFiles . '"/>';
-                            }
-                        }
-                    }*/
-            ?>
 
 
 			<script src="<?= BASE; ?>/_cdn/jquery.js"></script>

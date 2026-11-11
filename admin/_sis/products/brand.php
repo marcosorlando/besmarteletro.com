@@ -1,39 +1,44 @@
 <?php
+
+use App\Conn\Create;
+use App\Conn\Read;
+use App\Helpers\Check;
+
 $AdminLevel = LEVEL_WC_PRODUCTS;
-if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-    die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-endif;
+if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
 
 // AUTO INSTANCE OBJECT READ
-if (empty($Read)):
-    $Read = new Read;
-endif;
+if (empty($Read)) {
+    $Read ??= new Read();
+}
 
 // AUTO INSTANCE OBJECT CREATE
-if (empty($Create)):
-    $Create = new Create;
-endif;
+if (empty($Create)) {
+    $Create ??= new Create();
+}
 
 $BrandId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if ($BrandId):
-    $Read->ExeRead(DB_PDT_BRANDS, "WHERE brand_id = :id", "id={$BrandId}");
-    if ($Read->getResult()):
-        $FormData = array_map('htmlspecialchars', $Read->getResult()[0]);
+if ($BrandId) {
+    $Read->exeRead(DB_PDT_BRANDS, "WHERE brand_id = :id", "id={$BrandId}");
+    if ($Read->getResult()) {
+        $FormData = array_map(static fn($value) => Check::safeHtmlChars($value), $Read->getResult()[0]);
         extract($FormData);
-    else:
-        $_SESSION['trigger_controll'] = Erro("<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um fabricante que não existe ou que foi removido recentemente!", E_USER_NOTICE);
+    } else {
+        $_SESSION['trigger_controll'] = Check::erro("<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um fabricante que não existe ou que foi removido recentemente!", E_USER_NOTICE);
         header('Location: dashboard.php?wc=products/brands');
         exit;
-    endif;
-else:
+    }
+} else {
     $Date = date('Y-m-d H:i:s');
     $Title = "Novo Fabricante - {$Date}";
-    $Name = Check::Name($Title);
+    $Name = Check::name($Title);
     $CarCreate = ['brand_name' => $Name, 'brand_created' => $Date];
-    $Create->ExeCreate(DB_PDT_BRANDS, $CarCreate);
+    $Create->exeCreate(DB_PDT_BRANDS, $CarCreate);
     header('Location: dashboard.php?wc=products/brand&id=' . $Create->getResult());
     exit;
-endif;
+}
 ?>
 
 <header class="dashboard_header">

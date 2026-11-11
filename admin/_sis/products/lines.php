@@ -1,30 +1,36 @@
 <?php
+
+use App\Conn\Delete;
+use App\Conn\Read;
+use App\Helpers\Check;
+use App\Models\Pager;
+
 $AdminLevel = LEVEL_WC_PRODUCTS;
-if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-    die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-endif;
+if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
 
 //AUTO DELETE USER TRASH
-if (DB_AUTO_TRASH):
-    $Delete = new Delete;
-    $Delete->ExeDelete(DB_PDT_LINES, "WHERE line_name IS NULL AND line_image IS NULL AND line_status = :st", "st=0");
-endif;
+if (DB_AUTO_TRASH) {
+    $Delete ??= new Delete();
+    $Delete->exeDelete(DB_PDT_LINES, "WHERE line_name IS NULL AND line_image IS NULL AND line_status = :st", "st=0");
+}
 
 // AUTO INSTANCE OBJECT READ
-if (empty($Read)):
-    $Read = new Read;
-endif;
+if (empty($Read)) {
+    $Read ??= new Read();
+}
 
 $S = filter_input(INPUT_GET, "s", FILTER_DEFAULT);
 
 $WhereString = (!empty($S) ? " AND line_title LIKE '%{$S}%' OR line_id LIKE '%{$S}%' " : "");
 
 $Search = filter_input_array(INPUT_POST);
-if ($Search && $Search['s']):
+if ($Search && $Search['s']) {
     $S = urlencode($Search['s']);
     header("Location: dashboard.php?wc=products/lines&s={$S}");
     exit;
-endif;
+}
 ?>
 
 <header class="dashboard_header">
@@ -55,15 +61,15 @@ endif;
     $getPage = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT);
     $Page = ($getPage ? $getPage : 1);
     $Pager = new Pager("dashboard.php?wc=products/lines&page=", "<<", ">>", 5);
-    $Pager->ExePager($Page, 12);
+    $Pager->exePager($Page, 12);
 
-	$Read->ExeRead(DB_PDT_LINES, "WHERE 1 = 1 $WhereString ORDER BY line_title ASC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
+	$Read->exeRead(DB_PDT_LINES, "WHERE 1 = 1 $WhereString ORDER BY line_title ASC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
 
-    if (!$Read->getResult()):
-        $Pager->ReturnPage();
-        echo Erro("<span class='al_center icon-notification'>Ainda não existem linhas cadastradas {$Admin['user_name']}. Comece agora mesmo cadastrando uma nova linha.</span>", E_USER_NOTICE);
-    else:
-        foreach ($Read->getResult() as $Lines):
+    if (!$Read->getResult()) {
+        $Pager->returnPage();
+        echo Check::erro("<span class='al_center icon-notification'>Ainda não existem linhas cadastradas {$Admin['user_name']}. Comece agora mesmo cadastrando uma nova linha.</span>", E_USER_NOTICE);
+    } else {
+        foreach ($Read->getResult() as $Lines) {
             extract($Lines);
             $line_title = ($line_title ?: '');
             $LineImage = "../uploads/{$line_image}";
@@ -79,9 +85,9 @@ endif;
                         <a class='btn btn_green' href='dashboard.php?wc=products/line&id={$line_id}' title='Gerenciar Usuário!'>Gerenciar linha</a>
                     </div>
                 </article>";
-        endforeach;
-        $Pager->ExePaginator(DB_USERS);
+        }
+        $Pager->exePaginator(DB_USERS);
         echo $Pager->getPaginator();
-    endif;
+    }
     ?>
 </div>

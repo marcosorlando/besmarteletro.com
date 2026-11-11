@@ -1,19 +1,22 @@
 <?php
-    $AdminLevel = LEVEL_WC_SLIDES;
-    if (!APP_SLIDE || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-        die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-    endif;
 
-    // AUTO INSTANCE OBJECT READ
-    if (empty($Read)):
-        $Read = new Read;
-    endif;
+use App\Conn\Delete;
+use App\Conn\Read;
+use App\Helpers\Check;
+use App\Models\Pager;
 
-    //AUTO DELETE POST TRASH
-    if (DB_AUTO_TRASH):
-        $Delete = new Delete;
-        $Delete->ExeDelete(DB_SLIDES, "WHERE slide_image_desktop IS NULL AND slide_title IS NULL AND slide_id >= :st", "st=1");
-    endif;
+$AdminLevel = LEVEL_WC_SLIDES;
+if (!APP_SLIDE || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
+
+$Read = new Read();
+
+//AUTO DELETE POST TRASH
+if (DB_AUTO_TRASH !== 0) {
+    $Delete = new Delete();
+    $Delete->exeDelete(DB_SLIDES, 'WHERE slide_image_desktop IS NULL AND slide_title IS NULL AND slide_id >= :st', 'st=1');
+}
 ?>
 
 <header class="dashboard_header">
@@ -37,13 +40,13 @@
         $getPage = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT);
         $Page = ($getPage ? $getPage : 0);
         $Pager = new Pager('dashboard.php?wc=slide/home&page=', "<<", ">>", 3);
-        $Pager->ExePager($Page, 5);
-        $Read->ExeRead(DB_SLIDES, "WHERE slide_status = 1 AND slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL) ORDER BY slide_date DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
-        if (!$Read->getResult()):
-            $Pager->ReturnPage();
-            Erro("<span class='al_center icon-notification'>Ainda não existem conteúdos em destaque cadastrados em seu site. Comece cadastrando o primeiro!</span>", E_USER_NOTICE);
-        else:
-            foreach ($Read->getResult() as $Slide):
+        $Pager->exePager($Page, 5);
+        $Read->exeRead(DB_SLIDES, "WHERE slide_status = 1 AND slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL) ORDER BY slide_date DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
+        if (!$Read->getResult()) {
+            $Pager->returnPage();
+            echo Check::erro("<span class='al_center icon-notification'>Ainda não existem conteúdos em destaque cadastrados em seu site. Comece cadastrando o primeiro!</span>", E_USER_NOTICE);
+        } else {
+            foreach ($Read->getResult() as $Slide) {
                 extract($Slide);
                 echo "<article class='box box100 slide_single' id='{$slide_id}'>
                     <header>
@@ -78,11 +81,10 @@
                     <span rel='slide_single' callback='Slides' callback_action='delete' class='j_delete_action_confirm icon-warning btn btn_yellow' style='display: none' id='{$slide_id}'>Deletar Destaque?</span>
                     </div>
                 </article>";
-            endforeach;
+            }
 
-            $Pager->ExePaginator(DB_SLIDES, "WHERE slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL)");
+            $Pager->exePaginator(DB_SLIDES, "WHERE slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL)");
             echo $Pager->getPaginator();
-
-        endif;
+        }
     ?>
 </div>

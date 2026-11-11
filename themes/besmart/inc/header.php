@@ -77,11 +77,11 @@
 					</li>
 
 					<?php
-						$Read->FullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent IS NULL ORDER BY cat_title ASC");
-						if ($Read->getResult()):
+						$Read->fullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent IS NULL ORDER BY cat_title ASC");
+						if ($Read->getResult()) {
 
-							foreach ($Read->getResult() as $SES):
-								$Read->FullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent ORDER BY cat_title ASC",
+							foreach ($Read->getResult() as $SES) {
+								$Read->fullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent ORDER BY cat_title ASC",
 									"parent={$SES['cat_id']}");
 
 								echo "<li>";
@@ -90,10 +90,10 @@
 								echo "<a href='" . BASE . "/produtos/{$SES['cat_name']}' title='{$SES['cat_title']}'>{$SES['cat_title']}</a>";
 								echo "</div>";
 
-								if ($Read->getResult()):
+								if ($Read->getResult()) {
 									echo "<ul>";
-									foreach ($Read->getResult() as $CAT):
-										$Read->FullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent ORDER BY cat_title ASC",
+									foreach ($Read->getResult() as $CAT) {
+										$Read->fullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent ORDER BY cat_title ASC",
 											"parent={$CAT['cat_id']}");
 
 										echo "<li>";
@@ -102,25 +102,25 @@
 										echo "<a href='" . BASE . "/produtos/{$CAT['cat_name']}' title='{$CAT['cat_title']}'>{$CAT['cat_title']}</a>";
 										echo "</div>";
 
-										if ($Read->getResult()):
+										if ($Read->getResult()) {
 											echo "<ul>";
-											foreach ($Read->getResult() as $SUBCAT):
+											foreach ($Read->getResult() as $SUBCAT) {
 												echo "<li>";
 												echo "<div>";
 												echo "<div class='j_cat_open_end_close'><i class='fa fa-angle-double-down'></i></div>";
 												echo "<a href='" . BASE . "/produtos/{$SUBCAT['cat_name']}' title='{$SUBCAT['cat_title']}'>{$SUBCAT['cat_title']}</a>";
 												echo "</div>";
 												echo "</li>";
-											endforeach;
+											}
 											echo "</ul>";
-										endif;
+										}
 										echo "</li>";
-									endforeach;
+									}
 									echo "</ul>";
-								endif;
+								}
 								echo "</li>";
-							endforeach;
-						endif;
+							}
+						}
 					?>
 
 					<li>
@@ -134,13 +134,13 @@
 					</li>
 
 					<?php
-						$Read->FullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent IS NULL ORDER BY category_title ASC");
+						$Read->fullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent IS NULL ORDER BY category_title ASC");
 
-						if ($Read->getResult()):
+						if ($Read->getResult()) {
 
-							foreach ($Read->getResult() as $SES):
+							foreach ($Read->getResult() as $SES) {
 
-								$Read->FullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent = :cat ORDER BY category_title ASC",
+								$Read->fullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent = :cat ORDER BY category_title ASC",
 									"cat={$SES['category_id']}");
 
 								echo "<li>";
@@ -149,10 +149,10 @@
 								echo "<a href='" . BASE . "/artigos/{$SES['category_name']}' title='{$SES['category_title']}'>{$SES['category_title']}</a>";
 								echo "</div>";
 
-								if ($Read->getResult()):
+								if ($Read->getResult()) {
 									echo "<ul>";
-									foreach ($Read->getResult() as $CAT):
-										$Read->FullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent = :parent ORDER BY category_title ASC",
+									foreach ($Read->getResult() as $CAT) {
+										$Read->fullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent = :parent ORDER BY category_title ASC",
 											"parent={$CAT['category_id']}");
 
 										echo "<li>";
@@ -161,25 +161,25 @@
 										echo "<a href='" . BASE . "/produtos/{$CAT['category_name']}' title='{$CAT['category_title']}'>{$CAT['category_title']}</a>";
 										echo "</div>";
 
-										if ($Read->getResult()):
+										if ($Read->getResult()) {
 											echo "<ul>";
-											foreach ($Read->getResult() as $SUBCAT):
+											foreach ($Read->getResult() as $SUBCAT) {
 												echo "<li>";
 												echo "<div>";
 												echo "<div class='j_category_open_end_close'><i class='fa fa-angle-double-down'></i></div>";
 												echo "<a href='" . BASE . "/produtos/{$SUBCAT['category_name']}' title='{$SUBCAT['category_title']}'>{$SUBCAT['category_title']}</a>";
 												echo "</div>";
 												echo "</li>";
-											endforeach;
+											}
 											echo "</ul>";
-										endif;
+										}
 										echo "</li>";
-									endforeach;
+									}
 									echo "</ul>";
-								endif;
+								}
 								echo "</li>";
-							endforeach;
-						endif;
+							}
+						}
 					?>
 
 				</ul>
@@ -211,9 +211,9 @@
 							   title="Sobre BE.SMART" class="wc_goto"> Quem<br>Somos</a>
 						</li>
 						<?php
-							$Read->FullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent IS NULL ORDER BY cat_title ASC");
-							if ($Read->getResult()):
-								foreach ($Read->getResult() as $SES):
+							$Read->fullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent IS NULL ORDER BY cat_title ASC");
+							if ($Read->getResult()) {
+								foreach ($Read->getResult() as $SES) {
 									?>
 									<li>
 									<a href='<?= BASE . '/produtos/' . $SES['cat_name']; ?>'
@@ -221,11 +221,11 @@
 									</a>
 									<?php
 
-									$Read->FullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent = :cat ORDER BY cat_title ASC",
+									$Read->fullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent = :cat ORDER BY cat_title ASC",
 										"cat={$SES['cat_id']}");
-									if ($Read->getResult()):
+									if ($Read->getResult()) {
 										echo "<ul  id=\"{$SES['cat_title']}\">";
-										foreach ($Read->getResult() as $CAT):
+										foreach ($Read->getResult() as $CAT) {
 											?>
 											<li>
 											<a href="<?= BASE . '/produtos/' . $CAT['cat_name']; ?>"
@@ -233,31 +233,31 @@
 
 											<?php
 											$Read->setPlaces("cat={$CAT['cat_id']}");
-											if ($Read->getResult()):
+											if ($Read->getResult()) {
 												echo "<ul id='{$CAT['cat_title']}'>";
-												foreach ($Read->getResult() as $SUBCAT):
+												foreach ($Read->getResult() as $SUBCAT) {
 													?>
 													<li>
 														<a href="<?= BASE . '/produtos/' . $SUBCAT['cat_name']; ?>"
 														   title="<?= $SUBCAT['cat_title']; ?>"> <?= $SUBCAT['cat_title']; ?></a>
 													</li>
 												<?php
-												endforeach;
+												}
 												echo " </ul>";
-											endif;
+											}
 											?>
 											</li>
 										<?php
-										endforeach;
+										}
 										echo "</ul>";
-									endif;
+									}
 									?>
 									</li>
 								<?php
-								endforeach;
-							endif;
+								}
+							}
 
-							$Read->FullRead("SELECT page_id, page_title, page_name FROM " . DB_PAGES . " WHERE page_status <> 0 ORDER BY page_order, page_title ASC");
+							$Read->fullRead("SELECT page_id, page_title, page_name FROM " . DB_PAGES . " WHERE page_status <> 0 ORDER BY page_order, page_title ASC");
 							if ($Read->getResult()) {
 								foreach ($Read->getResult() as $pages) {
 									extract($pages);
@@ -271,9 +271,9 @@
 						</li>
 
 						<?php
-							$Read->FullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent IS NULL ORDER BY category_title ASC");
-							if ($Read->getResult()):
-								foreach ($Read->getResult() as $SES):
+							$Read->fullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent IS NULL ORDER BY category_title ASC");
+							if ($Read->getResult()) {
+								foreach ($Read->getResult() as $SES) {
 									?>
 									<li>
 									<a href='<?= BASE . '/artigos/' . $SES['category_name']; ?>'
@@ -281,11 +281,11 @@
 									</a>
 									<?php
 
-									$Read->FullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent = :cat ORDER BY category_title ASC",
+									$Read->fullRead("SELECT category_id, category_title, category_name FROM " . DB_CATEGORIES . " WHERE category_parent = :cat ORDER BY category_title ASC",
 										"cat={$SES['category_id']}");
-									if ($Read->getResult()):
+									if ($Read->getResult()) {
 										echo "<ul id=\"{$SES['category_title']}\">";
-										foreach ($Read->getResult() as $CAT):
+										foreach ($Read->getResult() as $CAT) {
 											?>
 											<li>
 											<a href="<?= BASE . '/artigos/' . $CAT['category_name']; ?>"
@@ -293,29 +293,29 @@
 
 											<?php
 											$Read->setPlaces("cat={$CAT['category_id']}");
-											if ($Read->getResult()):
+											if ($Read->getResult()) {
 												echo "<ul>";
-												foreach ($Read->getResult() as $SUBCAT):
+												foreach ($Read->getResult() as $SUBCAT) {
 													?>
 													<li>
 														<a href="<?= BASE . '/artigos/' . $SUBCAT['category_name']; ?>"
 														   title="<?= $SUBCAT['category_title']; ?>"><?= $SUBCAT['category_title']; ?></a>
 													</li>
 												<?php
-												endforeach;
+												}
 												echo " </ul>";
-											endif;
+											}
 											?>
 											</li>
 										<?php
-										endforeach;
+										}
 										echo "</ul>";
-									endif;
+									}
 									?>
 									</li>
 								<?php
-								endforeach;
-							endif;
+								}
+							}
 						?>
 
 					</ul>
@@ -347,7 +347,7 @@
 					</form>
 				</div>
 				<div class='header_whatsapp'>
-					<a target="_blank" href='<?= Check::WhatsMessage(SITE_ADDR_WHATS,"Olá! Obrigado pelo seu contato com a Be Smart! Nossa equipe está pronta para te atender.Responderemos o mais breve possível! Atenciosamente, Equipe Be Smart") ?>'><span class='fa fa-whatsapp'></span>VAMOS CONVERSAR</a>
+					<a target="_blank" href='<?= Check::whatsMessage(SITE_ADDR_WHATS,"Olá! Obrigado pelo seu contato com a Be Smart! Nossa equipe está pronta para te atender.Responderemos o mais breve possível! Atenciosamente, Equipe Be Smart") ?>'><span class='fa fa-whatsapp'></span>VAMOS CONVERSAR</a>
 				</div>
 			</div>
 		</div>

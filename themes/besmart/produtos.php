@@ -1,11 +1,15 @@
 <?php
 
-	$Read->ExeRead(DB_PDT_CATS,
+use App\Helpers\Check;
+use App\Models\Pager;
+
+
+	$Read->exeRead(DB_PDT_CATS,
 		"WHERE cat_name = :cat",
 		"cat={$URL[1]}");
-	if (!$Read->getResult()):
+	if (!$Read->getResult()) {
 		require REQUIRE_PATH . '/404.php';
-	else:
+	} else {
 		extract($Read->getResult()[0]);
 		?>
 		<div class="categories container">
@@ -41,7 +45,7 @@
 					<div class="products_wrap">
 						<?php
 
-							$Read->FullRead("SELECT COUNT(p.pdt_id) AS total_pdt FROM " . DB_PDT . " p WHERE p.pdt_status = :status {$condSearch}{$condDepartment}",
+							$Read->fullRead("SELECT COUNT(p.pdt_id) AS total_pdt FROM " . DB_PDT . " p WHERE p.pdt_status = :status {$condSearch}{$condDepartment}",
 								"status=1{$parseSearch}{$parseDepartment}");
 							$total_pdt = $Read->getResult()[0]['total_pdt'];
 
@@ -52,27 +56,27 @@
 								"<i class='fa fa-angle-right'></i><i class='fa fa-angle-right'></i>",
 								3,
 								$total_pdt);
-							$Pager->ExePager($getPage,
+							$Pager->exePager($getPage,
 								15);
 
-							$Read->FullRead(
+							$Read->fullRead(
 								"SELECT p.*, l.line_title, l.line_image FROM " . DB_PDT . " p, " . DB_PDT_LINES . " l WHERE l.line_id = p.pdt_line AND p.pdt_status = :status {$condSearch}{$condDepartment} ORDER BY p.pdt_created DESC LIMIT :limit OFFSET :offset",
 								"status=1{$parseSearch}{$parseDepartment}&limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
 
-							if ($Read->getResult()):
-								foreach ($Read->getResult() as $PDT):
+							if ($Read->getResult()) {
+								foreach ($Read->getResult() as $PDT) {
 									extract($PDT);
 									require REQUIRE_PATH . '/inc/product_int.php';
-								endforeach;
+								}
 
-								$Pager->ExeFullPaginator("SELECT p.* FROM " . DB_PDT . " p WHERE p.pdt_status = :status {$condSearch}{$condDepartment}",
+								$Pager->exeFullPaginator("SELECT p.* FROM " . DB_PDT . " p WHERE p.pdt_status = :status {$condSearch}{$condDepartment}",
 									"status=1{$parseSearch}{$parseDepartment}");
 								echo $Pager->getPaginator();
-							else:
-								Erro("<p class='al_center'><b>OPPSSS:</b> Desculpe, mas o seu filtro não retornou resultados!</p>",
+							} else {
+								Check::erro("<p class='al_center'><b>OPPSSS:</b> Desculpe, mas o seu filtro não retornou resultados!</p>",
 									E_USER_NOTICE);
-								$Pager->ReturnPage();
-							endif;
+								$Pager->returnPage();
+							}
 						?>
 					</div>
 				</section>
@@ -81,5 +85,5 @@
 			</div>
 		</div>
 	<?php
-	endif;
+	}
 ?>

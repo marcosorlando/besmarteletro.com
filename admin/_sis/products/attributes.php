@@ -1,13 +1,16 @@
 <?php
+
+use App\Conn\Read;
+
     $AdminLevel = LEVEL_WC_PRODUCTS;
-    if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-        die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-    endif;
+    if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+        exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+    }
 
     // AUTO INSTANCE OBJECT READ
-    if (empty($Read)):
-        $Read = new Read;
-    endif;
+    if (empty($Read)) {
+        $Read ??= new Read();
+    }
 ?>
 
 <header class="dashboard_header">
@@ -334,10 +337,10 @@
 
 <div class="dashboard_content j_group_target">
     <?php
-        $Read->FullRead("SELECT * FROM " . DB_PDT_GROUPS_ATTR . " ORDER BY group_order ASC, group_created DESC");
-        if ($Read->getResult()):
+        $Read->fullRead("SELECT * FROM " . DB_PDT_GROUPS_ATTR . " ORDER BY group_order ASC, group_created DESC");
+        if ($Read->getResult()) {
 
-            foreach ($Read->getResult() as $GROUP):
+            foreach ($Read->getResult() as $GROUP) {
                 ?>
                 <div class="attr_group box box33 wc_draganddrop" callback="Products" callback_action="group_order" id="<?= $GROUP['group_id']; ?>">
                     <div class="panel_header default al_center">
@@ -358,32 +361,32 @@
                         <div class="attr_group_scroll j_attr_item_target_<?= $GROUP['group_id']; ?>">
 
                             <?php
-                                $Read->FullRead("SELECT attr_" . $GROUP['group_type'] . "_id, attr_" . $GROUP['group_type'] . "_code, attr_" . $GROUP['group_type'] . "_title FROM " . ($GROUP['group_type'] == 'size' ? DB_PDT_ATTR_SIZES : ($GROUP['group_type'] == 'color' ? DB_PDT_ATTR_COLORS : DB_PDT_ATTR_PRINTS)) . " WHERE group_id = :group ORDER BY attr_" . $GROUP['group_type'] . "_created DESC", "group={$GROUP['group_id']}");
+                                $Read->fullRead("SELECT attr_" . $GROUP['group_type'] . "_id, attr_" . $GROUP['group_type'] . "_code, attr_" . $GROUP['group_type'] . "_title FROM " . ($GROUP['group_type'] == 'size' ? DB_PDT_ATTR_SIZES : ($GROUP['group_type'] == 'color' ? DB_PDT_ATTR_COLORS : DB_PDT_ATTR_PRINTS)) . " WHERE group_id = :group ORDER BY attr_" . $GROUP['group_type'] . "_created DESC", "group={$GROUP['group_id']}");
 
-                                if ($Read->getResult()):
+                                if ($Read->getResult()) {
                                     //var_dump($Read->getResult());   $attr_print_id  $GROUP['group_type']
 
-                                    foreach ($Read->getResult() as $ATTR):
+                                    foreach ($Read->getResult() as $ATTR) {
                                         extract($ATTR);
 
-                                        if ($GROUP['group_type'] == 'color'):
-                                            if (strpos($attr_color_code, ',')):
+                                        if ($GROUP['group_type'] == 'color') {
+                                            if (strpos($attr_color_code, ',')) {
                                                 $arr_color = explode(',', $attr_color_code);
                                                 $bg_color = (count($arr_color) == 2 ? "style='background-image: linear-gradient(45deg, {$arr_color[0]}  50%, {$arr_color[1]} 50%);'" : (count($arr_color) == 3 ? "style='background-image: linear-gradient(45deg, {$arr_color[0]}  33%, {$arr_color[1]} 33%, {$arr_color[1]} 67%, {$arr_color[2]} 67%, {$arr_color[2]});'" : "style='background-image: linear-gradient(45deg, {$arr_color[0]}  25%, {$arr_color[1]} 25%, {$arr_color[1]} 50%, {$arr_color[2]} 50%, {$arr_color[2]} 75%, {$arr_color[3]} 75%, {$arr_color[3]});'"));
-                                            else:
+                                            } else {
                                                 $bg_color = "style='background-color: {$attr_color_code};'";
-                                            endif;
-                                        elseif ($GROUP['group_type'] == 'print'):
+                                            }
+                                        } elseif ($GROUP['group_type'] == 'print') {
                                             $bg_print = "style='background: url(" . BASE . "/uploads/{$attr_print_code}) center / cover no-repeat;'";
-                                        endif;
+                                        }
                                         ?>
 
                                         <div class="attr_group_item <?= "attr_{$GROUP['group_type']}_" . ($GROUP['group_type'] == 'size' ? $attr_size_id : ($GROUP['group_type'] == 'color' ? $attr_color_id : $attr_print_id)); ?>" id="<?= ($GROUP['group_type'] == 'size' ? $attr_size_id : ($GROUP['group_type'] == 'color' ? $attr_color_id : $attr_print_id)); ?>">
 
                                             <div<?= ($GROUP['group_type'] == 'color' ? " {$bg_color}" : ($GROUP['group_type'] == 'print' ? " {$bg_print}" : '')); ?> class='attr_group_item_code' title="<?= ($GROUP['group_type'] == 'size' ? $attr_size_title : ($GROUP['group_type'] == 'color' ? $attr_color_title : $attr_print_title)); ?>">
-                                                <?php if ($GROUP['group_type'] == 'size'): ?>
+                                                <?php if ($GROUP['group_type'] == 'size') { ?>
                                                     <span class="attr_group_item_code_size"><?= $attr_size_code; ?></span>
-                                                <?php endif; ?>
+                                                <?php } ?>
 
                                                 <span rel="<?= "attr_{$GROUP['group_type']}_" . ($GROUP['group_type'] == 'size' ? $attr_size_id : ($GROUP['group_type'] == 'color' ? $attr_color_id : $attr_print_id)); ?>" class="j_delete_action attr_group_item_remove icon-cancel-circle icon-notext" id="<?= ($GROUP['group_type'] == 'size' ? $attr_size_id : ($GROUP['group_type'] == 'color' ? $attr_color_id : $attr_print_id)); ?>"></span>
 
@@ -396,14 +399,14 @@
                                             </div>
                                         </div>
                                     <?php
-                                    endforeach;
-                                endif;
+                                    }
+                                }
                             ?>
                         </div>
                     </div>
                 </div>
             <?php
-            endforeach;
-        endif;
+            }
+        }
     ?>
 </div>

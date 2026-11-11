@@ -1,36 +1,43 @@
 <?php
 
+use App\Conn\Create;
+use App\Conn\Delete;
+use App\Conn\Read;
+use App\Helpers\Check;
+use App\Models\Pager;
+
+
     $AdminLevel = LEVEL_WC_PRODUCTS;
-    if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-        die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-    endif;
+    if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+        exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+    }
 
     //AUTO DELETE PRODUCT TRASH
-    if (DB_AUTO_TRASH):
-        $Delete = new Delete;
-        $Delete->ExeDelete(DB_PDT, "WHERE pdt_title IS NULL AND pdt_content IS NULL and pdt_status = :st", "st=0");
+    if (DB_AUTO_TRASH) {
+        $Delete ??= new Delete();
+        $Delete->exeDelete(DB_PDT, "WHERE pdt_title IS NULL AND pdt_content IS NULL and pdt_status = :st", "st=0");
 
         //AUTO TRASH IMAGES
-        $Read->FullRead("SELECT image FROM " . DB_PDT_IMAGE . " WHERE product_id NOT IN(SELECT pdt_id FROM " . DB_PDT . ")");
-        if ($Read->getResult()):
-            $Delete->ExeDelete(DB_PDT_IMAGE, "WHERE id >= :id AND product_id NOT IN(SELECT pdt_id FROM " . DB_PDT . ")", "id=1");
-            foreach ($Read->getResult() as $ImageRemove):
-                if (file_exists("../uploads/{$ImageRemove['image']}") && !is_dir("../uploads/{$ImageRemove['image']}")):
+        $Read->fullRead("SELECT image FROM " . DB_PDT_IMAGE . " WHERE product_id NOT IN(SELECT pdt_id FROM " . DB_PDT . ")");
+        if ($Read->getResult()) {
+            $Delete->exeDelete(DB_PDT_IMAGE, "WHERE id >= :id AND product_id NOT IN(SELECT pdt_id FROM " . DB_PDT . ")", "id=1");
+            foreach ($Read->getResult() as $ImageRemove) {
+                if (file_exists("../uploads/{$ImageRemove['image']}") && !is_dir("../uploads/{$ImageRemove['image']}")) {
                     unlink("../uploads/{$ImageRemove['image']}");
-                endif;
-            endforeach;
-        endif;
-    endif;
+                }
+            }
+        }
+    }
 
     // AUTO INSTANCE OBJECT READ
-    if (empty($Read)):
-        $Read = new Read;
-    endif;
+    if (empty($Read)) {
+        $Read ??= new Read();
+    }
 
     // AUTO INSTANCE OBJECT CREATE
-    if (empty($Create)):
-        $Create = new Create;
-    endif;
+    if (empty($Create)) {
+        $Create ??= new Create();
+    }
 
     $S = filter_input(INPUT_GET, "s", FILTER_DEFAULT);
     $O = filter_input(INPUT_GET, "opt", FILTER_DEFAULT);
@@ -39,12 +46,12 @@
     $WhereOpt = ((!empty($O) && $O == 'outsale') ? " AND pdt_status != 1 " : "");
 
     $Search = filter_input_array(INPUT_POST);
-    if ($Search):
+    if ($Search) {
         $S = urlencode($Search['s']);
         $O = urlencode($Search['opt']);
         header("Location: dashboard.php?wc=products/home&opt={$O}&s={$S}");
         exit;
-    endif;
+    }
 ?>
 
 <header class="dashboard_header">
@@ -74,18 +81,18 @@
     <?php
 
         $RedirectOpt = (!empty($WhereOpt) ? "&opt=outsale" : "");
-        $Page = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT);
+        $Page = (int) filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT);
         $Pager = new Pager("dashboard.php?wc=products/home{$RedirectOpt}&page=", "<<", ">>", 5);
-        $Pager->ExePager($Page, 12);
-        $Read->ExeRead(DB_PDT, "WHERE 1 = 1 $WhereString $WhereOpt ORDER BY pdt_created DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
-        if (!$Read->getResult()):
-            $Pager->ReturnPage();
-            echo Erro("<span class='al_center icon-notification'>Ainda não existem produtos cadastrados {$Admin['user_name']}. Comece agora mesmo criando seu primeiro produto!</span>", E_USER_NOTICE);
-        else:
-            foreach ($Read->getResult() as $Products):
+        $Pager->exePager($Page, 12);
+        $Read->exeRead(DB_PDT, "WHERE 1 = 1 $WhereString $WhereOpt ORDER BY pdt_created DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
+        if (!$Read->getResult()) {
+            $Pager->returnPage();
+            echo Check::erro("<span class='al_center icon-notification'>Ainda não existem produtos cadastrados {$Admin['user_name']}. Comece agora mesmo criando seu primeiro produto!</span>", E_USER_NOTICE);
+        } else {
+            foreach ($Read->getResult() as $Products) {
                 extract($Products);
                 $PdtImage = ($pdt_cover && file_exists("../uploads/{$pdt_cover}") && !is_dir("../uploads/{$pdt_cover}") ? "uploads/{$pdt_cover}" : 'admin/_img/no_image.jpg');
-                $PdtTitle = ($pdt_title ? Check::Chars($pdt_title, 45) : 'Edite este produto para coloca-lo a venda!');
+                $PdtTitle = ($pdt_title ? Check::chars($pdt_title, 45) : 'Edite este produto para coloca-lo a venda!');
                 $PdtCode = ($pdt_code ? $pdt_code : 'indefinido');
                 $PdtClass = ($pdt_status != 1 ? 'inactive' : '');
 
@@ -95,26 +102,26 @@
                 <header>
                     <h1><a target='_blank' href='" . BASE . "/produto/{$pdt_name}' title='Ver {$PdtTitle} no site'>{$PdtTitle}</a></h1>";
 
-                $Read->FullRead("SELECT line_title FROM " . DB_PDT_LINES . " WHERE line_id = :id", "id={$pdt_line}");
+                $Read->fullRead("SELECT line_title FROM " . DB_PDT_LINES . " WHERE line_id = :id", "id={$pdt_line}");
                $Line = ($Read->getResult() ? $Read->getResult()[0]['line_title'] : 'indefinida');
 
-                $Read->FullRead("SELECT cat_title FROM " . DB_PDT_CATS . " WHERE cat_id = :cat", "cat={$pdt_category}");
+                $Read->fullRead("SELECT cat_title FROM " . DB_PDT_CATS . " WHERE cat_id = :cat", "cat={$pdt_category}");
                 $Category = ($Read->getResult() ? $Read->getResult()[0]['cat_title'] : 'indefinida');
 
-                $Read->FullRead("SELECT cat_title FROM " . DB_PDT_CATS . " WHERE cat_id = :cat", "cat={$pdt_subcategory}");
+                $Read->fullRead("SELECT cat_title FROM " . DB_PDT_CATS . " WHERE cat_id = :cat", "cat={$pdt_subcategory}");
                 $SubCategory = ($Read->getResult() ? $Read->getResult()[0]['cat_title'] : 'indefinida');
 
                 $PdtSoldVar = null;
                 $PdtStockVar = null;
-                $Read->FullRead("SELECT size_id, stock_inventory, stock_sold FROM " . DB_PDT_STOCK . " WHERE pdt_id = :id", "id={$pdt_id}");
-                if ($Read->getResult()):
-                    foreach ($Read->getResult() as $StockVarKey):
-                        if ($StockVarKey['size_id'] != 'default'):
+                $Read->fullRead("SELECT size_id, stock_inventory, stock_sold FROM " . DB_PDT_STOCK . " WHERE pdt_id = :id", "id={$pdt_id}");
+                if ($Read->getResult()) {
+                    foreach ($Read->getResult() as $StockVarKey) {
+                        if ($StockVarKey['size_id'] != 'default') {
                             $PdtSoldVar .= " | {$StockVarKey['size_id']}: {$StockVarKey['stock_sold']}";
                             $PdtStockVar .= " | {$StockVarKey['size_id']}: {$StockVarKey['stock_inventory']}";
-                        endif;
-                    endforeach;
-                else:
+                        }
+                    }
+                } else {
                     /* RETRO COMPATIBILIDADE WC */
                     /* CUSTOM BY ALISSON */
                     $CreateStock = [
@@ -124,8 +131,8 @@
                         'stock_inventory' => $pdt_inventory,
                         'stock_sold' => ($pdt_delivered ? $pdt_delivered : 0)
                     ];
-                    $Create->ExeCreate(DB_PDT_STOCK, $CreateStock);
-                endif;
+                    $Create->exeCreate(DB_PDT_STOCK, $CreateStock);
+                }
 
                 echo "</header>
             </div>
@@ -142,10 +149,10 @@
                 <span rel='single_pdt' callback='Products' callback_action='delete' class='j_delete_action_confirm icon-warning btn btn_yellow' style='display: none' id='{$pdt_id}'>Remover Produto?</span>
             </div>
         </article>";
-            endforeach;
-            $Pager->ExePaginator(DB_PDT, "WHERE 1 = 1 {$WhereString} {$WhereOpt}");
+            }
+            $Pager->exePaginator(DB_PDT, "WHERE 1 = 1 {$WhereString} {$WhereOpt}");
             echo $Pager->getPaginator();
 
-        endif;
+        }
     ?>
 </div>

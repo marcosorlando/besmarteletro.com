@@ -38,7 +38,7 @@
 				</div>
 				</form>
 				<div class="falecom">
-					<a class="whats" href="<?=Check::WhatsMessage(SITE_ADDR_WHATS, "Olá! Estou navegando no site Be Smart!")?>" target="_blank"><i class="icon-whatsapp"></i> <?=
+					<a class="whats" href="<?=Check::whatsMessage(SITE_ADDR_WHATS, "Olá! Estou navegando no site Be Smart!")?>" target="_blank"><i class="icon-whatsapp"></i> <?=
 							SITE_ADDR_PHONE_A?></a>
 					<a class="mail" href="mailto:<?= SITE_ADDR_EMAIL?>" target="_blank"><i class="icon-envelop"></i><?=
 							SITE_ADDR_EMAIL?></a>
@@ -121,7 +121,7 @@
 				</div>
 
 					<div class='header_whatsapp'>
-						<a target="_blank" href='<?= Check::WhatsMessage(SITE_ADDR_WHATS,"Olá! Obrigado pelo seu contato com a Be Smart! Nossa equipe está pronta para te atender.Responderemos o mais breve possível! Atenciosamente, Equipe Be Smart") ?>'><span class='fa fa-whatsapp'></span>VAMOS CONVERSAR</a>
+						<a target="_blank" href='<?= Check::whatsMessage(SITE_ADDR_WHATS,"Olá! Obrigado pelo seu contato com a Be Smart! Nossa equipe está pronta para te atender.Responderemos o mais breve possível! Atenciosamente, Equipe Be Smart") ?>'><span class='fa fa-whatsapp'></span>VAMOS CONVERSAR</a>
 					</div>
 
 

@@ -1,39 +1,44 @@
 <?php
+
+use App\Conn\Create;
+use App\Conn\Read;
+use App\Helpers\Check;
+
 $AdminLevel = LEVEL_WC_PRODUCTS;
-if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-    die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-endif;
+if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
 
 // AUTO INSTANCE OBJECT READ
-if (empty($Read)):
-    $Read = new Read;
-endif;
+if (empty($Read)) {
+    $Read ??= new Read();
+}
 
 // AUTO INSTANCE OBJECT CREATE
-if (empty($Create)):
-    $Create = new Create;
-endif;
+if (empty($Create)) {
+    $Create ??= new Create();
+}
 
 $CatId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if ($CatId):
-    $Read->ExeRead(DB_PDT_CATS, "WHERE cat_id = :id", "id={$CatId}");
-    if ($Read->getResult()):
-        $FormData = array_map('htmlspecialchars', $Read->getResult()[0]);
+if ($CatId) {
+    $Read->exeRead(DB_PDT_CATS, "WHERE cat_id = :id", "id={$CatId}");
+    if ($Read->getResult()) {
+        $FormData = array_map(static fn($value) => Check::safeHtmlChars($value), $Read->getResult()[0]);
         extract($FormData);
-    else:
-        $_SESSION['trigger_controll'] = Erro("<b>OPPSS {$Admin['user_name']}</b>, você tentou editar uma categoria que não existe ou que foi removida recentemente!", E_USER_NOTICE);
+    } else {
+        $_SESSION['trigger_controll'] = Check::erro("<b>OPPSS {$Admin['user_name']}</b>, você tentou editar uma categoria que não existe ou que foi removida recentemente!", E_USER_NOTICE);
         header('Location: dashboard.php?wc=products/categories');
         exit;
-    endif;
-else:
+    }
+} else {
     $Date = date('Y-m-d H:i:s');
     $Title = "Nova Categoria - {$Date}";
-    $Name = Check::Name($Title);
+    $Name = Check::name($Title);
     $CarCreate = ['cat_name' => $Name, 'cat_created' => $Date];
-    $Create->ExeCreate(DB_PDT_CATS, $CarCreate);
+    $Create->exeCreate(DB_PDT_CATS, $CarCreate);
     header('Location: dashboard.php?wc=products/category&id=' . $Create->getResult());
     exit;
-endif;
+}
 ?>
 
 <header class="dashboard_header">
@@ -84,24 +89,24 @@ endif;
                     <span class="category_selection_legend">Setor:</span>
                     <span class="category_selection_title j_open_category_selection">
                         <?php
-                        if (empty($cat_parent)):
+                        if (empty($cat_parent)) {
                             echo 'Esse é um setor!';
-                        else:
-                            $Read->LinkResult(DB_PDT_CATS, 'cat_id', $cat_parent, 'cat_title');
+                        } else {
+                            $Read->linkResult(DB_PDT_CATS, 'cat_id', $cat_parent, 'cat_title');
                             echo $Read->getResult()[0]['cat_title'];
-                        endif;
+                        }
                         ?>
                     </span>
 
                     <div class="category_selection_content j_category_selection_content">
                         <?php
-                        $Read->FullRead("SELECT cat_id, cat_parent, cat_tree, cat_title FROM " . DB_PDT_CATS . " WHERE cat_parent IS NULL ORDER BY cat_title ASC");
+                        $Read->fullRead("SELECT cat_id, cat_parent, cat_tree, cat_title FROM " . DB_PDT_CATS . " WHERE cat_parent IS NULL ORDER BY cat_title ASC");
 
                         function loopCat() {
                             global $Read, $cat_id, $cat_parent;
-                            if ($Read->getResult()):
-                                foreach ($Read->getResult() as $CAT):
-                                    $Read->FullRead("SELECT cat_id, cat_parent, cat_tree, cat_title FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent ORDER BY cat_title ASC", "parent={$CAT['cat_id']}");
+                            if ($Read->getResult()) {
+                                foreach ($Read->getResult() as $CAT) {
+                                    $Read->fullRead("SELECT cat_id, cat_parent, cat_tree, cat_title FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent ORDER BY cat_title ASC", "parent={$CAT['cat_id']}");
 
                                     echo "<li>";
                                     echo "<span>";
@@ -110,14 +115,14 @@ endif;
                                     echo "<label" . ($CAT['cat_id'] == $cat_id || $CAT['cat_parent'] == $cat_id || in_array($cat_id, explode(',', $CAT['cat_tree'])) ? ' class="disabled"' : '') . " for='radio-category-{$CAT['cat_id']}'>{$CAT['cat_title']}</label>";
                                     echo "</span>";
 
-                                    if ($Read->getResult()):
+                                    if ($Read->getResult()) {
                                         echo "<ul>";
                                         loopCat();
                                         echo "</ul>";
-                                    endif;
+                                    }
                                     echo "</li>";
-                                endforeach;
-                            endif;
+                                }
+                            }
                         }
 
                         echo "<ul>";

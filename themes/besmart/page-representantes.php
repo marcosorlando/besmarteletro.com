@@ -1,13 +1,13 @@
 <?php
 
-    $Read->ExeRead(DB_PAGES, "WHERE page_name = :nm", "nm={$URL[0]}");
-    if (!$Read->getResult()):
+    $Read->exeRead(DB_PAGES, "WHERE page_name = :nm", "nm={$URL[0]}");
+    if (!$Read->getResult()) {
         require REQUIRE_PATH . '/404.php';
 
         return;
-    else:
+    } else {
         extract($Read->getResult()[0]);
-    endif;
+    }
 ?>
 <?php require REQUIRE_PATH. '/inc/slides.php'; ?>
 <section class="options">

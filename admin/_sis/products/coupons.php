@@ -1,19 +1,25 @@
 <?php
+
+use App\Conn\Delete;
+use App\Conn\Read;
+use App\Helpers\Check;
+use App\Models\Pager;
+
 $AdminLevel = LEVEL_WC_PRODUCTS;
-if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-    die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-endif;
+if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
 
 // AUTO INSTANCE OBJECT READ
-if (empty($Read)):
-    $Read = new Read;
-endif;
+if (empty($Read)) {
+    $Read ??= new Read();
+}
 
 //AUTO DELETE POST TRASH
-if (DB_AUTO_TRASH):
-    $Delete = new Delete;
-    $Delete->ExeDelete(DB_PDT_COUPONS, "WHERE cp_coupon IS NULL AND cp_id >= :st", "st=1");
-endif;
+if (DB_AUTO_TRASH) {
+    $Delete ??= new Delete();
+    $Delete->exeDelete(DB_PDT_COUPONS, "WHERE cp_coupon IS NULL AND cp_id >= :st", "st=1");
+}
 ?>
 
 <header class="dashboard_header">
@@ -40,13 +46,13 @@ endif;
     $getPage = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT);
     $Page = ($getPage ? $getPage : 1);
     $Pager = new Pager("dashboard.php?wc=products/coupons&page=", "<<", ">>", 3);
-    $Pager->ExePager($Page, 12);
-    $Read->ExeRead(DB_PDT_COUPONS, "ORDER BY cp_end DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
-    if (!$Read->getResult()):
-        $Pager->ReturnPage();
-        echo Erro("<span class='al_center icon-notification'>Ainda não existem cupons de desconto cadastrados {$Admin['user_name']}. Comece agora mesmo criando uma nova oferta e aumente suas conversões!</span>", E_USER_NOTICE);
-    else:
-        foreach ($Read->getResult() as $Coupon):
+    $Pager->exePager($Page, 12);
+    $Read->exeRead(DB_PDT_COUPONS, "ORDER BY cp_end DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
+    if (!$Read->getResult()) {
+        $Pager->returnPage();
+        echo Check::erro("<span class='al_center icon-notification'>Ainda não existem cupons de desconto cadastrados {$Admin['user_name']}. Comece agora mesmo criando uma nova oferta e aumente suas conversões!</span>", E_USER_NOTICE);
+    } else {
+        foreach ($Read->getResult() as $Coupon) {
             $Active = ($Coupon['cp_start'] <= date('Y-m-d H:i:s') && $Coupon['cp_end'] >= date('Y-m-d H:i:s') ? 'active' : '');
             echo "<article class='product_coupon {$Active} box box25' id='{$Coupon['cp_id']}'>
             <div class='box_content'>
@@ -62,9 +68,9 @@ endif;
                 <span rel='product_coupon' callback='Products' callback_action='coupon_remove' class='j_delete_action_confirm btn btn_yellow icon-warning' style='display: none;' id='{$Coupon['cp_id']}'>Deletar Cupom?</span>
             </div>
         </article>";
-        endforeach;
-        $Pager->ExePaginator(DB_PDT_COUPONS);
+        }
+        $Pager->exePaginator(DB_PDT_COUPONS);
         echo $Pager->getPaginator();
-    endif;
+    }
     ?>
 </div>

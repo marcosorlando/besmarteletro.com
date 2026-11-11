@@ -1,27 +1,33 @@
 <?php
 
+use App\Conn\Create;
+use App\Conn\Update;
+use App\Helpers\Check;
+use App\Models\Pager;
+
+
 	$Search = urldecode($URL[1]);
 
-	if (empty($_SESSION['search']) || !in_array($Search, $_SESSION['search'])):
-		$Read->FullRead("SELECT search_id, search_count FROM " . DB_SEARCH . " WHERE search_key = :key",
+	if (empty($_SESSION['search']) || !in_array($Search, $_SESSION['search'])) {
+		$Read->fullRead("SELECT search_id, search_count FROM " . DB_SEARCH . " WHERE search_key = :key",
 			"key={$Search}");
-		if ($Read->getResult()):
-			$Update = new Update;
+		if ($Read->getResult()) {
+			$Update ??= new Update();
 			$DataSearch = ['search_count' => $Read->getResult()[0]['search_count'] + 1];
-			$Update->ExeUpdate(DB_SEARCH, $DataSearch, "WHERE search_id = :id",
+			$Update->exeUpdate(DB_SEARCH, $DataSearch, "WHERE search_id = :id",
 				"id={$Read->getResult()[0]['search_id']}");
-		else:
-			$Create = new Create;
+		} else {
+			$Create ??= new Create();
 			$DataSearch = [
 				'search_key' => $Search,
 				'search_count' => 1,
 				'search_date' => date('Y-m-d H:i:s'),
 				'search_commit' => date('Y-m-d H:i:s')
 			];
-			$Create->ExeCreate(DB_SEARCH, $DataSearch);
-		endif;
+			$Create->exeCreate(DB_SEARCH, $DataSearch);
+		}
 		$_SESSION['search'][] = $Search;
-	endif;
+	}
 ?>
 <div class="categories container">
 	<div class="content">
@@ -52,7 +58,7 @@
 			</ul>
 
 			<?php
-				$Read->FullRead("SELECT COUNT(p.pdt_id) AS total_pdt FROM " . DB_PDT . " p WHERE p.pdt_status = :status {$condSearch}{$condDepartment}",
+				$Read->fullRead("SELECT COUNT(p.pdt_id) AS total_pdt FROM " . DB_PDT . " p WHERE p.pdt_status = :status {$condSearch}{$condDepartment}",
 					"status=1{$parseSearch}{$parseDepartment}");
 				$total_pdt = $Read->getResult()[0]['total_pdt'];
 
@@ -60,26 +66,26 @@
 				$Pager = new Pager(BASE . "/pesquisa/" . urlencode($URL[1]) . "/",
 					"<i class='fa fa-angle-left'></i><i class='fa fa-angle-left'></i>",
 					"<i class='fa fa-angle-right'></i><i class='fa fa-angle-right'></i>", 3, $total_pdt);
-				$Pager->ExePager($getPage, 1);
+				$Pager->exePager($getPage, 1);
 
-				$Read->FullRead("SELECT p.*, l.line_title, l.line_image FROM " . DB_PDT . " p, " . DB_PDT_LINES . " l WHERE l.line_id = p.pdt_line AND p.pdt_status = :status {$condSearch}{$condDepartment} ORDER BY p.pdt_created DESC LIMIT :limit OFFSET :offset",
+				$Read->fullRead("SELECT p.*, l.line_title, l.line_image FROM " . DB_PDT . " p, " . DB_PDT_LINES . " l WHERE l.line_id = p.pdt_line AND p.pdt_status = :status {$condSearch}{$condDepartment} ORDER BY p.pdt_created DESC LIMIT :limit OFFSET :offset",
 					"status=1{$parseSearch}{$parseDepartment}&limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
 
-				if ($Read->getResult()):
-					foreach ($Read->getResult() as $PDT):
+				if ($Read->getResult()) {
+					foreach ($Read->getResult() as $PDT) {
 						extract($PDT);
 
 						require REQUIRE_PATH . '/inc/product_int.php';
-					endforeach;
+					}
 
-					$Pager->ExeFullPaginator("SELECT p.* FROM " . DB_PDT . " p WHERE p.pdt_status = :status {$condSearch}{$condDepartment}",
+					$Pager->exeFullPaginator("SELECT p.* FROM " . DB_PDT . " p WHERE p.pdt_status = :status {$condSearch}{$condDepartment}",
 						"status=1{$parseSearch}{$parseDepartment}");
 					echo $Pager->getPaginator();
-				else:
-					Erro("<p class='al_center'><b>OPPSSS:</b> Desculpe, mas a sua pesquisa não retornou resultados!</p>",
+				} else {
+					Check::erro("<p class='al_center'><b>OPPSSS:</b> Desculpe, mas a sua pesquisa não retornou resultados!</p>",
 						E_USER_NOTICE);
-					$Pager->ReturnPage();
-				endif;
+					$Pager->returnPage();
+				}
 			?>
 		</section>
 

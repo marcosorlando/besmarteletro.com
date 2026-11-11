@@ -1,19 +1,24 @@
 <?php
+
+use App\Conn\Delete;
+use App\Conn\Read;
+use App\Helpers\Check;
+
 $AdminLevel = LEVEL_WC_PRODUCTS;
-if (!APP_PRODUCTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
-    die('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-endif;
+if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+}
 
 // AUTO INSTANCE OBJECT READ
-if (empty($Read)):
-    $Read = new Read;
-endif;
+if (empty($Read)) {
+    $Read ??= new Read();
+}
 
 //AUTO DELETE POST TRASH
-if (DB_AUTO_TRASH):
-    $Delete = new Delete;
-    $Delete->ExeDelete(DB_PDT_CATS, "WHERE cat_title IS NULL AND cat_parent IS NULL AND cat_id >= :st", "st=1");
-endif;
+if (DB_AUTO_TRASH) {
+    $Delete ??= new Delete();
+    $Delete->exeDelete(DB_PDT_CATS, "WHERE cat_title IS NULL AND cat_parent IS NULL AND cat_id >= :st", "st=1");
+}
 ?>
 
 <header class="dashboard_header">
@@ -40,13 +45,13 @@ endif;
     ######## CUSTOM BY ALISSON #########
     ----------------------------------->
     <?php
-    $Read->FullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent IS NULL ORDER BY cat_title ASC");
+    $Read->fullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent IS NULL ORDER BY cat_title ASC");
 
     function loopCat() {
         global $Read;
-        if ($Read->getResult()):
-            foreach ($Read->getResult() as $CAT):
-                $Read->FullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent ORDER BY cat_title ASC", "parent={$CAT['cat_id']}");
+        if ($Read->getResult()) {
+            foreach ($Read->getResult() as $CAT) {
+                $Read->fullRead("SELECT cat_id, cat_title, cat_name FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent ORDER BY cat_title ASC", "parent={$CAT['cat_id']}");
 
                 echo "<li class='single_category_item' id={$CAT['cat_id']}>";
                 echo "<div class='j_cat_open_end_close'>";
@@ -59,14 +64,14 @@ endif;
                 echo "</div>";
                 echo "</div>";
 
-                if ($Read->getResult()):
+                if ($Read->getResult()) {
                     echo "<ul>";
                     loopCat();
                     echo "</ul>";
-                endif;
+                }
                 echo "</li>";
-            endforeach;
-        endif;
+            }
+        }
     }
 
     echo "<ul class='single_category'>";
@@ -75,12 +80,12 @@ endif;
     ?>
 
     <?php
-    /* $Read->ExeRead(DB_PDT_CATS, "WHERE cat_parent IS NULL ORDER BY cat_title ASC");
-      if (!$Read->getResult()):
-      echo Erro("<span class='al_center icon-notification'>Ainda não existem categorias de produtos cadastradas {$Admin['user_name']}. Comece agora mesmo criando seu primeiro setor, e então suas categorias!</span>", E_USER_NOTICE);
-      else:
-      foreach ($Read->getResult() as $Sector):
-      $Read->FullRead("SELECT count(pdt_id) AS total FROM " . DB_PDT . " WHERE pdt_category = :sector", "sector={$Sector['cat_id']}");
+    /* $Read->exeRead(DB_PDT_CATS, "WHERE cat_parent IS NULL ORDER BY cat_title ASC");
+      if (!$Read->getResult()) {
+      echo Check::erro("<span class='al_center icon-notification'>Ainda não existem categorias de produtos cadastradas {$Admin['user_name']}. Comece agora mesmo criando seu primeiro setor, e então suas categorias!</span>", E_USER_NOTICE);
+      } else {
+      foreach ($Read->getResult() as $Sector) {
+      $Read->fullRead("SELECT count(pdt_id) AS total FROM " . DB_PDT . " WHERE pdt_category = :sector", "sector={$Sector['cat_id']}");
       $TotalPdtSector = $Read->getResult()[0]['total'];
       $Sector['cat_sizes'] = (!empty($Sector['cat_sizes']) ? $Sector['cat_sizes'] : 'default');
 
@@ -93,10 +98,10 @@ endif;
       <span rel='product_category' callback='Products' callback_action='cat_delete' class='j_delete_action_confirm btn btn_yellow icon-warning' style='display: none;' id='{$Sector['cat_id']}'>Deletar Categoria?</span>
       </header>";
 
-      $Read->ExeRead(DB_PDT_CATS, "WHERE cat_parent = :sector", "sector={$Sector['cat_id']}");
-      if ($Read->getResult()):
-      foreach ($Read->getResult() as $Cat):
-      $Read->FullRead("SELECT count(pdt_id) AS total FROM " . DB_PDT . " WHERE pdt_subcategory = :cat", "cat={$Cat['cat_id']}");
+      $Read->exeRead(DB_PDT_CATS, "WHERE cat_parent = :sector", "sector={$Sector['cat_id']}");
+      if ($Read->getResult()) {
+      foreach ($Read->getResult() as $Cat) {
+      $Read->fullRead("SELECT count(pdt_id) AS total FROM " . DB_PDT . " WHERE pdt_subcategory = :cat", "cat={$Cat['cat_id']}");
       $TotalPdtCat = $Read->getResult()[0]['total'];
       $Cat['cat_sizes'] = (!empty($Cat['cat_sizes']) ? $Cat['cat_sizes'] : 'default');
 
@@ -107,10 +112,10 @@ endif;
       <span rel='product_subcategory' class='j_delete_action btn btn_red icon-cancel-circle icon-notext' id='{$Cat['cat_id']}'></span>
       <span rel='product_subcategory' callback='Products' callback_action='cat_delete' class='j_delete_action_confirm btn btn_yellow icon-warning' style='display: none;' id='{$Cat['cat_id']}'>Deletar Categoria?</span>
       </article>";
-      endforeach;
-      endif;
+      }
+      }
       echo "</article>";
-      endforeach;
-      endif; */
+      }
+      } */
     ?>
 </div>

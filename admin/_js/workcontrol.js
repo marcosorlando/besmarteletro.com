@@ -1,3 +1,4 @@
+
 /*
  * Biblioteca de eventos jQuery do Painel Work Control Pro Content Manager
  * Created on : 06/01/2016, 11:15:16
