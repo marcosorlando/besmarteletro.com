@@ -1,0 +1,44 @@
+fix: corrige pesquisa do blog, SEO, hellobar, canonical e erros do CSS
+
+Pesquisa do blog
+- index.php: formulário envia "b", mas o código lia "p" (busca sempre vazia).
+- Termo da URL usa urlencode (+) em vez de %20, que o Apache bloqueia (AH10411),
+  e remove / ? # & % + que quebram o rewrite.
+- pesquisa-blog.php: remove dupla codificação do termo; filtros separados por
+  tipo (termo, ?author, ?month); paginação com o mesmo WHERE da listagem e
+  mantendo ?author/?month; escapa o termo (XSS); remove consulta inútil por post.
+- Registra a pesquisa com search_origin = POST e search_parse (author/month).
+- pesquisa.php: registra a pesquisa de produtos com search_origin = PROD e
+  escapa o termo exibido.
+
+Banco de dados (rodar em produção ANTES do deploy - ver DATABASELOG.md)
+- ws_search: novas colunas search_origin e search_parse + índice
+  idx_search_key_origin, já usadas pelos relatórios do admin.
+
+SEO
+- Seo.php: adiciona o caso "pesquisa-blog" (antes caía no "Oppsss, nada
+  encontrado!"), com título por termo, autor ou mês; escapa títulos de pesquisa.
+- index.php: canonical, og:url, itemprop url, twitter:url e amphtml com
+  segmentos codificados, sem query de rastreio e escapados.
+- index.php: meta robots "noindex, follow" em /pesquisa e /pesquisa-blog.
+
+Hellobar
+- hellobar.ajax.php: corrige SQL quebrado (implode com "','', ") que gerava
+  Fatal em toda página interna; regras via placeholders (fim do SQL injection);
+  usa apenas o caminho da URL, decodificado; ids de sessão/cookie/track como int.
+
+Admin
+- home1.php e searchnow-products.php: remove a coluna inexistente pdt_tags
+  (usa pdt_code) e a tabela de outro projeto DB_PDT_TRAVI (usa DB_PDT).
+
+Widget de filtro
+- filter.php: corrige "Undefined variable $cat_id" na busca de produtos.
+
+CSS (themes/besmart/style.css + style.min.css regenerado)
+- Corrige "!important" solto (erro de sintaxe), caminho de svg/retangle.svg,
+  .padding-bottom-0/.margin-bottom-0 que alteravam o topo, align-items: top,
+  margin-right: 0 auto, seletor sem vírgula em .full-screen.
+- Remove propriedades duplicadas/sobrescritas, prefixos inexistentes e mescla
+  seletores duplicados (.products_item_title, section).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -78,8 +78,8 @@ if (!$Read->getResult()) {
     foreach ($Read->getResult() as $Search) {
         extract($Search);
         $Read->fullRead(
-            'SELECT pdt_id FROM '.DB_PDT_TRAVI." WHERE pdt_status = 1 AND (pdt_title LIKE '%' :s '%' OR pdt_subtitle LIKE '%' :s '%' OR pdt_tags LIKE '%' :s '%')",
-            's='.$search_key
+            'SELECT pdt_id FROM '.DB_PDT." WHERE pdt_status = 1 AND (pdt_title LIKE '%' :s '%' OR pdt_subtitle LIKE '%' :s '%' OR pdt_code LIKE '%' :s '%')",
+            http_build_query(['s' => $search_key])
         );
         $ResultPosts = $Read->getRowCount();
 

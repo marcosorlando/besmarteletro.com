@@ -4,11 +4,9 @@
     use App\Conn\Update;
     use App\Helpers\DateHelper;
 
-    setlocale(LC_ALL, "pt_BR", "pt_BR.iso-8859-1", "pt_BR.utf-8", "ptb");
-    date_default_timezone_set('America/Sao_Paulo');
-    if (!$Read) {
-        $Read ??= new Read();
-    }
+
+    $Read ??= new Read();
+
     $Read->exeRead(DB_POSTS, "WHERE post_name = :nm", "nm={$URL[1]}");
     if (!$Read->getResult()) {
         require REQUIRE_PATH . '/404.php';
@@ -103,7 +101,7 @@
 						<a href="<?= BASE; ?>/pesquisa-blog/<?= urlencode(trim(strtolower($value))) ?>" title="Pesquise por essa palavra-chave.
                         Clique
                         e Confira!"><?= trim($value) ?></a>
-                    <?php
+                        <?php
                     } ?>
 			</div>
 

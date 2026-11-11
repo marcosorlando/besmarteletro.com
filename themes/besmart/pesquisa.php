@@ -6,27 +6,31 @@ use App\Helpers\Check;
 use App\Models\Pager;
 
 
-	$Search = urldecode($URL[1]);
+	// $URL[1] já chega decodificado pelo rewrite (index.php?url=...)
+	$Search = trim(strip_tags((string)($URL[1] ?? '')));
+	$SearchHtml = htmlspecialchars($Search, ENT_QUOTES, 'UTF-8');
+	$SessionKey = 'PROD|' . $Search;
 
-	if (empty($_SESSION['search']) || !in_array($Search, $_SESSION['search'])) {
-		$Read->fullRead("SELECT search_id, search_count FROM " . DB_SEARCH . " WHERE search_key = :key",
-			"key={$Search}");
+	if ('' !== $Search && (empty($_SESSION['search']) || !in_array($SessionKey, $_SESSION['search'], true))) {
+		$Read->fullRead("SELECT search_id, search_count FROM " . DB_SEARCH . " WHERE search_key = :key AND search_origin = :origin",
+			http_build_query(['key' => $Search, 'origin' => 'PROD']));
 		if ($Read->getResult()) {
 			$Update ??= new Update();
-			$DataSearch = ['search_count' => $Read->getResult()[0]['search_count'] + 1];
+			$DataSearch = ['search_count' => $Read->getResult()[0]['search_count'] + 1, 'search_commit' => date('Y-m-d H:i:s')];
 			$Update->exeUpdate(DB_SEARCH, $DataSearch, "WHERE search_id = :id",
 				"id={$Read->getResult()[0]['search_id']}");
 		} else {
 			$Create ??= new Create();
 			$DataSearch = [
 				'search_key' => $Search,
+				'search_origin' => 'PROD',
 				'search_count' => 1,
 				'search_date' => date('Y-m-d H:i:s'),
 				'search_commit' => date('Y-m-d H:i:s')
 			];
 			$Create->exeCreate(DB_SEARCH, $DataSearch);
 		}
-		$_SESSION['search'][] = $Search;
+		$_SESSION['search'][] = $SessionKey;
 	}
 ?>
 <div class="categories container">
@@ -37,7 +41,7 @@ use App\Models\Pager;
 		<section class="products">
 			<header class="heading">
 				<h1>
-					Resultados de <span><?= $Search; ?></span>
+					Resultados de <span><?= $SearchHtml; ?></span>
 				</h1>
 			</header>
 
@@ -53,7 +57,7 @@ use App\Models\Pager;
 				</li>
 
 				<li class="active">
-					<?= $Search; ?>
+					<?= $SearchHtml; ?>
 				</li>
 			</ul>
 

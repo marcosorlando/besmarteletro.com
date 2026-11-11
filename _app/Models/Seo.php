@@ -3,15 +3,18 @@
     namespace App\Models;
 
     use App\Conn\Read;
+    use App\Helpers\Check;
 
     use function array_map;
     use function constant;
     use function defined;
     use function explode;
+    use function htmlspecialchars;
     use function in_array;
     use function is_array;
     use function is_numeric;
     use function is_string;
+    use function parse_url;
     use function rtrim;
     use function sprintf;
     use function str_pad;
@@ -291,7 +294,38 @@
                 $keyword = $this->link ?? '';
                 $this->assignSeo(
                     'WebSite',
-                    sprintf('Pesquisa por %s em %s', $keyword, SITE_NAME),
+                    htmlspecialchars(sprintf('Pesquisa por %s em %s', $keyword, SITE_NAME), ENT_QUOTES, 'UTF-8'),
+                    SITE_DESC,
+                    $this->defaultImagePath()
+                );
+
+                return;
+            }
+
+            if ('pesquisa-blog' === $this->file) {
+                $keyword = $this->link ?? '';
+                $query = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_QUERY);
+                $label = sprintf('Pesquisa por %s', $keyword);
+
+                if ('author' === $query && is_numeric($keyword)) {
+                    $author = $this->fetchSingleRow(
+                        $read,
+                        'SELECT user_name, user_lastname FROM ' . DB_USERS . ' WHERE user_id = :id',
+                        'id=' . (int)$keyword
+                    );
+                    if (null !== $author) {
+                        $label = 'Artigos de ' . trim(($author['user_name'] ?? '') . ' ' . ($author['user_lastname'] ?? ''));
+                    }
+                } elseif ('month' === $query && is_numeric($keyword)) {
+                    $month = Check::getWcMonths((int)$keyword);
+                    if (is_string($month)) {
+                        $label = 'Artigos de ' . $month;
+                    }
+                }
+
+                $this->assignSeo(
+                    'WebSite',
+                    htmlspecialchars(sprintf('%s no Blog - %s', $label, SITE_NAME), ENT_QUOTES, 'UTF-8'),
                     SITE_DESC,
                     $this->defaultImagePath()
                 );
@@ -354,7 +388,7 @@
                 $keyword = $this->link ?? '';
                 $this->assignSeo(
                     'WebSite',
-                    sprintf('Pesquisa por %s em %s', $keyword, SITE_NAME),
+                    htmlspecialchars(sprintf('Pesquisa por %s em %s', $keyword, SITE_NAME), ENT_QUOTES, 'UTF-8'),
                     SITE_DESC,
                     $this->defaultImagePath()
                 );

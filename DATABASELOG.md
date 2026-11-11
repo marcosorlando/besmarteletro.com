@@ -20,3 +20,16 @@ CREATE TABLE `trv_card_user` (
   PRIMARY KEY (`carduser_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ```
+
+# MARCOS ORLANDO 11/11/2026
+
+## -- Pesquisas: origem (blog/produtos) e tipo da pesquisa do blog
+
+Usadas por `admin/_sis/searchnow.php`, `searchnow-products.php`, `home1.php` e gravadas por `themes/besmart/pesquisa-blog.php` / `pesquisa.php`.
+
+```
+ALTER TABLE `ws_search`
+  ADD COLUMN `search_origin` varchar(10) DEFAULT NULL COMMENT 'POST = blog | PROD = produtos' AFTER `search_key`,
+  ADD COLUMN `search_parse` varchar(20) DEFAULT NULL COMMENT 'author | month | NULL = termo livre' AFTER `search_origin`,
+  ADD KEY `idx_search_key_origin` (`search_key`, `search_origin`);
+```

@@ -10,11 +10,12 @@
     ob_start();
     session_start();
 
-    setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'portuguese');
-    date_default_timezone_set('America/Sao_Paulo');
+    setlocale(LC_ALL, $_ENV["APP_LANG"]);
+    date_default_timezone_set($_ENV["APP_TIMEZONE"]);
 
     use App\Conn\Read;
     use App\Conn\Update;
+    use App\Helpers\Check;
     use App\Models\Seo;
     use App\Models\Session;
 
@@ -52,6 +53,18 @@
     $setURL = ('' === $getURL || '0' === $getURL ? 'index' : $getURL);
     $URL = explode('/', $setURL);
     $SEO = new Seo($setURL);
+
+    // URL CANÔNICA | cada segmento codificado no formato das rotas (espaço => +, acento => %XX),
+    // sem query string de rastreio. Na pesquisa do blog mantém ?author / ?month, que mudam o conteúdo.
+    $canonicalPath = BASE . '/' . implode('/', array_map('urlencode', explode('/', $getURL)));
+    $canonicalQuery = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_QUERY);
+    $canonicalURL = $canonicalPath
+        . ('pesquisa-blog' === $URL[0] && in_array($canonicalQuery, ['author', 'month'], true) ? "?{$canonicalQuery}" : '');
+    $canonicalPath = htmlspecialchars($canonicalPath, ENT_QUOTES, 'UTF-8');
+    $canonicalURL = htmlspecialchars($canonicalURL, ENT_QUOTES, 'UTF-8');
+
+    // ROBOTS | páginas de resultado de pesquisa não são indexadas, mas os links delas são seguidos
+    $metaRobots = in_array($URL[0], ['pesquisa', 'pesquisa-blog'], true) ? 'noindex, follow' : 'index, follow';
 
     // CHECK IF THIS POST TABLE TO AMP
     if (
@@ -95,10 +108,10 @@
 			<meta property="fb:pages" content="#"/>
 			<title><?= $SEO->getTitle(); ?></title>
 			<meta name="description" content="<?= $SEO->getDescription(); ?>"/>
-			<meta name="robots" content="index, follow"/>
+			<meta name="robots" content="<?= $metaRobots; ?>"/>
 			<meta name="msvalidate.01" content=""/>
 			<link rel="base" href="<?= BASE; ?>"/>
-			<link rel="canonical" href="<?= BASE; ?>/<?= $getURL; ?>"/>
+			<link rel="canonical" href="<?= $canonicalURL; ?>"/>
             <?php
 
                 if (
@@ -111,7 +124,7 @@
                     && (!empty($PostAmp)
                         && true == $PostAmp)
                 ) {
-                    echo '<link rel="amphtml" href="' . BASE . '/' . $getURL . '/amp" />' . "\r\n";
+                    echo '<link rel="amphtml" href="' . $canonicalPath . '/amp" />' . "\r\n";
                 }
             ?>
 			<link rel="alternate" type="application/rss+xml" href="<?= BASE; ?>/rss.php"/>
@@ -119,12 +132,12 @@
 			<meta itemprop="name" content="<?= $SEO->getTitle(); ?>"/>
 			<meta itemprop="description" content="<?= $SEO->getDescription(); ?>"/>
 			<meta itemprop="image" content="<?= $SEO->getImage(); ?>"/>
-			<meta itemprop="url" content="<?= BASE; ?>/<?= $getURL; ?>"/>
+			<meta itemprop="url" content="<?= $canonicalURL; ?>"/>
 			<meta property="og:type" content="article"/>
 			<meta property="og:title" content="<?= $SEO->getTitle(); ?>"/>
 			<meta property="og:description" content="<?= $SEO->getDescription(); ?>"/>
 			<meta property="og:image" content="<?= $SEO->getImage(); ?>"/>
-			<meta property="og:url" content="<?= BASE; ?>/<?= $getURL; ?>"/>
+			<meta property="og:url" content="<?= $canonicalURL; ?>"/>
 			<meta property="og:site_name" content="<?= SITE_NAME; ?>"/>
 			<meta property="og:locale" content="pt_BR"/>
 			<meta name="facebook-domain-verification" content=""/>
@@ -157,7 +170,13 @@
 			<meta property="twitter:title" content="<?= $SEO->getTitle(); ?>"/>
 			<meta property="twitter:description" content="<?= $SEO->getDescription(); ?>"/>
 			<meta property="twitter:image" content="<?= $SEO->getImage(); ?>"/>
-			<meta property="twitter:url" content="<?= BASE; ?>/<?= $getURL; ?>"/>
+			<meta property="twitter:url" content="<?= $canonicalURL; ?>"/>
+
+			<link rel='preconnect' href='https://fonts.googleapis.com'>
+			<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+			<link href='https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap'
+			      rel='stylesheet'>
+			<!-- Fonte principal do Site-->
 			<link rel='preconnect' href='https://fonts.googleapis.com'>
 			<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
 			<link href='https://fonts.googleapis.com/css2?family=<?= SITE_FONT_NAME; ?>:wght@<?= SITE_FONT_WEIGHT; ?>&display=swap'
@@ -190,13 +209,10 @@
 			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/widgets/filter/filter.min.css"/>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"/>
 
-
 			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/style.min.css'/>
 			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/_css/responsive.min.css'/>
 
-
 			<script src="<?= BASE; ?>/_cdn/jquery.js"></script>
-
 
 			<!-- Facebook Pixel Code -->
             <?php
@@ -285,20 +301,23 @@
             ) {
                 require __DIR__ . '/maintenance.php';
             } else {
-                // PESQUISA PRODUTOS
-                $Search = filter_input_array(INPUT_POST, FILTER_DEFAULT);
-                if ($Search && !empty($Search['p'])) {
-                    $Search = urlencode(strip_tags(trim($Search['p'])));
-                    header('Location: ' . BASE . '/pesquisa-produtos/' . $Search);
+                // Search | termo seguro para a URL amigável. Remove / ? # & % + (quebram o rewrite)
+                // e usa urlencode (espaço vira +), pois %20 é bloqueado pelo Apache (AH10411).
+                $searchSlug = static fn(string $term): string => urlencode(
+                    trim((string)preg_replace('/[\/?#&%+\s]+/u', ' ', strip_tags($term)))
+                );
+
+                // Search | Blog
+                $Search = filter_input_array(INPUT_POST);
+                if ($Search && !empty($Search['b']) && '' !== ($Term = $searchSlug((string)$Search['b']))) {
+                    header('Location: ' . BASE . '/pesquisa-blog/' . $Term);
 
                     exit;
                 }
 
-                // PESQUISA
-                $Search = filter_input_array(INPUT_POST, FILTER_DEFAULT);
-                if ($Search && !empty($Search['s'])) {
-                    $Search = urlencode(strip_tags(trim($Search['s'])));
-                    header('Location: ' . BASE . '/pesquisa/' . $Search);
+                // Search | Products
+                if ($Search && !empty($Search['s']) && '' !== ($Term = $searchSlug((string)$Search['s']))) {
+                    header('Location: ' . BASE . '/pesquisa/' . $Term);
 
                     exit;
                 }
@@ -415,7 +434,7 @@
                     } else {
                         trigger_error(
                             'Não foi possível incluir o arquivo themes/'
-                            . THEME . "/{$getURL}.php <b>(O arquivo 404 também não existe!)</b>"
+                            . THEME . '/' . htmlspecialchars($getURL, ENT_QUOTES, 'UTF-8') . '.php <b>(O arquivo 404 também não existe!)</b>'
                         );
                     }
                     echo '</main>';
@@ -471,7 +490,7 @@
                     } else {
                         trigger_error(
                             'Não foi possível incluir o arquivo themes/'
-                            . THEME . "/{$getURL}.php <b>(O arquivo 404 também não existe!)</b>"
+                            . THEME . '/' . htmlspecialchars($getURL, ENT_QUOTES, 'UTF-8') . '.php <b>(O arquivo 404 também não existe!)</b>'
                         );
                     }
                     echo '</main>';

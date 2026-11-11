@@ -16,7 +16,7 @@ $getPost = filter_input_array(INPUT_POST, FILTER_DEFAULT);
 $Read = new Read();
 if (!empty($getPost)) {
     if (!empty($getPost['action']) && 'track' == $getPost['action']) {
-        $HelloId = $getPost['hello'];
+        $HelloId = (int)($getPost['hello'] ?? 0);
 
         $Read->fullRead('SELECT hello_clicks FROM ' . DB_HELLO . ' WHERE hello_id = :id', 'id=' . $HelloId);
         if ($Read->getResult()) {
@@ -27,23 +27,35 @@ if (!empty($getPost)) {
             setcookie('wc_hello', $HelloId, time() + 604800, '/');
         }
     } elseif (!empty($getPost['url'])) {
-        $HelloUrl = str_replace(BASE, '', $getPost['url']);
-        $HelloArr = array_filter(explode('/', $HelloUrl));
-        $HelloClear = array_map('strip_tags', $HelloArr);
-        $HelloKeys = "'" . implode("','', ", array_map('strval', (array)$HelloClear)) . "'";
+        // Segmentos do caminho da página (sem domínio, query string e #hash) viram as regras possíveis
+        $HelloPath = (string)parse_url((string)$getPost['url'], PHP_URL_PATH);
+        $BasePath = (string)parse_url(BASE, PHP_URL_PATH);
+        if ('' !== $BasePath && str_starts_with($HelloPath, $BasePath)) {
+            $HelloPath = substr($HelloPath, strlen($BasePath));
+        }
+        $HelloClear = array_values(array_filter(
+            array_map(static fn(string $segment): string => trim(strip_tags(rawurldecode($segment))), explode('/', $HelloPath)),
+            static fn(string $segment): bool => '' !== $segment
+        ));
+        $HelloClear = $HelloClear ?: ['index'];
 
-        $WhereSession = null;
-        if (!empty($_SESSION['wc_hello'])) {
-            $WhereSession = "hello_id NOT IN('" . implode(
-                    "','",
-                    array_map('strval', (array)($_SESSION['wc_hello'] ?? []))
-                ) . "') AND";
+        // Placeholders nomeados para cada segmento (evita SQL quebrado e SQL injection)
+        $HelloPlaces = [];
+        foreach ($HelloClear as $Index => $Segment) {
+            $HelloPlaces["rule{$Index}"] = $Segment;
+        }
+        $HelloKeys = ':' . implode(', :', array_keys($HelloPlaces));
+
+        $WhereSession = '';
+        $SessionIds = array_filter(array_map('intval', (array)($_SESSION['wc_hello'] ?? [])));
+        if ($SessionIds) {
+            $WhereSession = 'hello_id NOT IN(' . implode(',', $SessionIds) . ') AND';
         }
 
         $getCookie = filter_input(INPUT_COOKIE, 'wc_hello', FILTER_VALIDATE_INT);
-        $WhereCookie = null;
+        $WhereCookie = '';
         if ($getCookie) {
-            $WhereCookie = sprintf('hello_id != %s AND', $getCookie);
+            $WhereCookie = sprintf('hello_id != %d AND', $getCookie);
         }
 
         $Read->fullRead(
@@ -57,7 +69,8 @@ if (!empty($getPost)) {
                 $HelloKeys
             )
             . 'AND hello_start <= NOW() AND hello_end >= NOW() AND hello_status = 1 '
-            . 'LIMIT 1'
+            . 'LIMIT 1',
+            http_build_query($HelloPlaces)
         );
 
         if ($Read->getResult()) {

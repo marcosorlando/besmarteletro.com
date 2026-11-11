@@ -1,44 +1,46 @@
 <?php
 
-// Colors
-$Read->exeRead(DB_TEMPLATE_COLORS, 'WHERE color_status = :status', "status=1");
-if ($Read->getResult()) {
+    use App\Conn\Read;
 
-	    // Background Color
-    $colorBackgroundOne = $Read->getResult()[0]['color_background_one'];
-    $colorBackgroundTwo = $Read->getResult()[0]['color_background_two'];
-    $colorBackgroundThree = $Read->getResult()[0]['color_background_three'];
-    $colorBackgroundFour = $Read->getResult()[0]['color_background_four'];
+    $Read ??= new Read();
+    // Colors
+    $Read->exeRead(DB_TEMPLATE_COLORS, 'WHERE color_status = :status', "status=1");
+    if ($Read->getResult()) {
+        // Background Color
+        $colorBackgroundOne = $Read->getResult()[0]['color_background_one'];
+        $colorBackgroundTwo = $Read->getResult()[0]['color_background_two'];
+        $colorBackgroundThree = $Read->getResult()[0]['color_background_three'];
+        $colorBackgroundFour = $Read->getResult()[0]['color_background_four'];
 
-    // Text Color
-    $colorTextOne = $Read->getResult()[0]['color_text_one'];
-    $colorTextTwo = $Read->getResult()[0]['color_text_two'];
-    $colorTextThree = $Read->getResult()[0]['color_text_three'];
-    $colorTextFour = $Read->getResult()[0]['color_text_four'];
+        // Text Color
+        $colorTextOne = $Read->getResult()[0]['color_text_one'];
+        $colorTextTwo = $Read->getResult()[0]['color_text_two'];
+        $colorTextThree = $Read->getResult()[0]['color_text_three'];
+        $colorTextFour = $Read->getResult()[0]['color_text_four'];
 
-    $colorBackgroundOneOpacity = $Read->getResult()[0]['color_background_one'] . 'e6';
-    $colorBackgroundTwoOpacity = $Read->getResult()[0]['color_background_two'] . 'e6';
-    $colorBackgroundThreeOpacity = $Read->getResult()[0]['color_background_three'] . 'e6';
-    $colorBackgroundFourOpacity = $Read->getResult()[0]['color_background_four'] . 'e6';
-} else {
-    // Background Color
-    $colorBackgroundOne = '#5a2d82';
-    $colorBackgroundTwo = '#7838a8';
-    $colorBackgroundThree = '#36ba9b';
-    $colorBackgroundFour = '#f5f5f5';
+        $colorBackgroundOneOpacity = $Read->getResult()[0]['color_background_one'] . 'e6';
+        $colorBackgroundTwoOpacity = $Read->getResult()[0]['color_background_two'] . 'e6';
+        $colorBackgroundThreeOpacity = $Read->getResult()[0]['color_background_three'] . 'e6';
+        $colorBackgroundFourOpacity = $Read->getResult()[0]['color_background_four'] . 'e6';
+    } else {
+        // Background Color
+        $colorBackgroundOne = '#5a2d82';
+        $colorBackgroundTwo = '#7838a8';
+        $colorBackgroundThree = '#36ba9b';
+        $colorBackgroundFour = '#f5f5f5';
 
-    // Background Color Opacity
-    $colorBackgroundOneOpacity = '#5a2d82cc';
-    $colorBackgroundTwoOpacity = '#7838a8';
-    $colorBackgroundThreeOpacity = '#36ba9bcc';
-    $colorBackgroundFourOpacity = '#f5f5f5cc';
+        // Background Color Opacity
+        $colorBackgroundOneOpacity = '#5a2d82cc';
+        $colorBackgroundTwoOpacity = '#7838a8';
+        $colorBackgroundThreeOpacity = '#36ba9bcc';
+        $colorBackgroundFourOpacity = '#f5f5f5cc';
 
-    // Text Color
-    $colorTextOne = '#5a2d82';
-    $colorTextTwo = '#7838a8';
-    $colorTextThree = '#36ba9b';
-    $colorTextFour = '#f5f5f5';
-}
+        // Text Color
+        $colorTextOne = '#5a2d82';
+        $colorTextTwo = '#7838a8';
+        $colorTextThree = '#36ba9b';
+        $colorTextFour = '#f5f5f5';
+    }
 ?>
 
 <style>
@@ -61,8 +63,7 @@ if ($Read->getResult()) {
         --color-text-three: <?= $colorTextThree; ?>;
         --color-text-four: <?= $colorTextFour; ?>;
 
-	    --font-family-primary: 'Barlow Semi Condensed', sans-serif;
-    ;
+        --font-family-primary: 'Barlow Semi Condensed', sans-serif;
     }
 
     * {

@@ -116,7 +116,7 @@
 
 	</form>
 
-	<div class="workcontrol_filter_access j_filter_access" data-history="<?= $cat_id; ?>">
+	<div class="workcontrol_filter_access j_filter_access" data-history="<?= $cat_id ?? ''; ?>">
 		<span class="icon-cog icon-notext"></span>
 	</div>
 </div>
