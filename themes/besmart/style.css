@@ -1162,14 +1162,19 @@ HEADER
     position: relative;
 }
 
-/* texto branco: o verde da marca sobre o cinza da faixa dava contraste 2,2:1; o ícone segue verde */
+/* o mesmo bloco aparece na faixa cinza do topo e no rodapé claro: texto escuro por padrão,
+   branco só sobre o cinza (o verde da marca dava 2,2:1 em um e 1,9:1 no outro); o ícone segue verde */
 .header_whatsapp a {
-    color: #ffffff;
+    color: var(--color-text-two);
     text-decoration: none;
     font-weight: 700; /* negrito conta como texto grande: 4,2:1 passa (mínimo 3:1) */
     letter-spacing: 1px;
     text-transform: uppercase;
     font-size: 1.3rem;
+}
+
+.header_belt .header_whatsapp a {
+    color: #ffffff;
 }
 
 .header_whatsapp a .fa {
@@ -3643,6 +3648,15 @@ ABOUT
     width: 48%;
 }
 
+/* título sobre o cinza escurecido do .about: o #333 padrão do .title-section ficaria com 2,5:1 */
+.about .info .title-section {
+    color: #ffffff;
+}
+
+.about .info .title-section:before {
+    content: url("images/svg/retangle-white.svg");
+}
+
 .about .info p {
     font-size: 1.5rem;
     color: #ffffff;
@@ -3680,6 +3694,19 @@ ABOUT
     transition: all ease-in-out .5s;
     opacity: 1;
     transform: scale(130%);
+}
+
+/* 16 ícones não cabem numa linha no celular (~960px em 412px): quebram em linhas em vez de vazar */
+@media (max-width: 990px) {
+    .belt {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 2% 5%;
+    }
+
+    .belt > img {
+        flex-grow: 0;
+    }
 }
 
 .about .dna {
@@ -3787,12 +3814,14 @@ FOOTER
 }
 
 .footer .content .extras > div p {
+    color: #666666; /* #999 do preset sobre #f6f6f6 dava 2,6:1 */
     font-weight: 400;
     font-size: 1rem;
     margin-bottom: 25px;
 }
 
 .footer .content .extras > div span {
+    color: #666666;
     font-weight: 600;
 }
 
@@ -4058,7 +4087,7 @@ FOOTER
 
 .footer_copy .content p {
     font-size: 0.885em;
-    color: var(--color-text-one);
+    color: #666666; /* #999 do preset sobre #f6f6f6 dava 2,6:1 */
     text-align: center;
     flex-basis: 80%;
     padding-left: 20%;

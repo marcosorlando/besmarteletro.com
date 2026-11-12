@@ -31,22 +31,30 @@
 		</div>
 
 		<div class="belt">
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/panela.svg' alt='Panela'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/sofa-2l.svg' alt='Sofá'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/forno.svg' alt='Forno'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/aspirador.svg' alt='Aspirador'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/torradeira.svg' alt='Torradeira'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/liquidificador.svg' alt='Liquidificador'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/rack-tv.svg' alt='Rack TV'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/churrasqueira.svg' alt='Churrasqueira'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/secador.svg' alt='Secador de Cabelo'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/ventilador.svg' alt='Ventilado'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/fogao.svg' alt='Fogão'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/ferro-de-passar.svg' alt='Ferro de Passar'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/geladeira.svg' alt='Geladeira'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/batedeira.svg' alt='Batedeira'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/som.svg' alt='Som'>
-			<img src='<?= INCLUDE_PATH; ?>/images/svg/abajur.svg' alt='Abajur'>
+			<?php
+				// width/height = proporção do viewBox de cada SVG (o CSS define a largura; a altura sai proporcional)
+				$beltIcons = [
+					'panela' => ['Panela', 189, 177],
+					'sofa-2l' => ['Sofá', 189, 148],
+					'forno' => ['Forno', 189, 189],
+					'aspirador' => ['Aspirador', 189, 189],
+					'torradeira' => ['Torradeira', 177, 189],
+					'liquidificador' => ['Liquidificador', 150, 189],
+					'rack-tv' => ['Rack TV', 189, 189],
+					'churrasqueira' => ['Churrasqueira', 177, 189],
+					'secador' => ['Secador de Cabelo', 189, 189],
+					'ventilador' => ['Ventilador', 163, 189],
+					'fogao' => ['Fogão', 189, 176],
+					'ferro-de-passar' => ['Ferro de Passar', 189, 162],
+					'geladeira' => ['Geladeira', 133, 189],
+					'batedeira' => ['Batedeira', 189, 189],
+					'som' => ['Som', 189, 162],
+					'abajur' => ['Abajur', 128, 173],
+				];
+				foreach ($beltIcons as $beltFile => [$beltAlt, $beltW, $beltH]) {
+					echo "<img src='" . INCLUDE_PATH . "/images/svg/{$beltFile}.svg' width='{$beltW}' height='{$beltH}' loading='lazy' alt='{$beltAlt}'>";
+				}
+			?>
 		</div>
 	</div>
 	<div class="container dna">
