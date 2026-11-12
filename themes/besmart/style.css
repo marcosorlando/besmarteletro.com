@@ -926,6 +926,7 @@ HEADER
 
 .header_mobile_logo .content a img {
     width: 250px;
+    height: auto;
     display: block;
     margin: 10px auto;
 }
@@ -1140,6 +1141,7 @@ HEADER
 
 .header_desktop_logo a img {
     margin-top: 15px;
+    width: auto;
     height: 60px;
 }
 
@@ -1164,7 +1166,7 @@ HEADER
 .header_whatsapp a {
     color: #ffffff;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700; /* negrito conta como texto grande: 4,2:1 passa (mínimo 3:1) */
     letter-spacing: 1px;
     text-transform: uppercase;
     font-size: 1.3rem;
@@ -3626,8 +3628,8 @@ ABOUT
 */
 
 .about {
-    /* cinza do preset escurecido 30%: texto branco sobre #b2b2b2 dava contraste 2,1:1 (mínimo 3:1) */
-    background-color: color-mix(in srgb, var(--color-background-two) 70%, #000000);
+    /* cinza do preset escurecido: texto branco sobre #b2b2b2 dava 2,1:1; 62% chega a 5:1 (mínimo 4,5:1 no mobile) */
+    background-color: color-mix(in srgb, var(--color-background-two) 62%, #000000);
     padding: 40px 0 0 0;
     overflow-y: auto;
 }
@@ -3703,6 +3705,7 @@ ABOUT
 }
 
 .about .dna .dna-list li span {
+    color: #666666; /* o --color-text-one do preset (#999) sobre branco dá 2,8:1 */
     font-size: 1.5rem;
     line-height: 1.3rem;
     font-weight: 300;
@@ -3819,7 +3822,7 @@ FOOTER
     text-transform: uppercase;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--color-text-one);
+    color: #666666; /* #999 do preset sobre #f6f6f6 dava 2,6:1 */
     text-decoration: none;
     transition: all .4s;
 }

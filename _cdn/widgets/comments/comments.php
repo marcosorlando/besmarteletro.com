@@ -18,7 +18,7 @@
     $Read ??= new Read();
 
     echo '<link rel="stylesheet" href="' . BASE . '/_cdn/widgets/comments/comments.css"/>';
-    echo '<script src="' . BASE . '/_cdn/widgets/comments/comments.js"></script>';
+    echo '<script src="' . BASE . '/_cdn/widgets/comments/comments.js" defer></script>';
 
 // USUÁRIO
     $UserName = empty($_SESSION['userLogin']) ? null : ' ' . $_SESSION['userLogin']['user_name'];

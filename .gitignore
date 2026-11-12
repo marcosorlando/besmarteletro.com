@@ -61,3 +61,6 @@ cache
 
 #Deployments e builds
 deploy-ftp.env
+
+# bundle de CSS gerado em runtime pelo _cdn/css-bundle.php
+/_cdn/bundle/

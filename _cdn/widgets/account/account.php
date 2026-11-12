@@ -8,8 +8,8 @@ $AccountBaseUI = BASE.'/conta';
 
 echo "<link rel='stylesheet' href='".BASE."/_cdn/widgets/account/account.css'/>";
 echo "<link rel='stylesheet' href='".BASE."/_cdn/bootcss/fonticon.css'/>";
-echo '<script src="'.BASE.'/_cdn/jquery.form.js"></script>';
-echo '<script src="'.BASE.'/_cdn/widgets/account/account.js"></script>';
+echo '<script src="'.BASE.'/_cdn/jquery.form.js" defer></script>';
+echo '<script src="'.BASE.'/_cdn/widgets/account/account.js" defer></script>';
 
 // LOGIN
 if ('' === $AccountAction || '0' === $AccountAction || 'login' === $AccountAction) {

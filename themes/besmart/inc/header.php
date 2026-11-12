@@ -16,7 +16,7 @@
 			<div class="header_mobile_logo container">
 				<div class="content">
 					<a href="<?= BASE; ?>" title="<?= SITE_NAME; ?>">
-						<img src="<?= INCLUDE_PATH; ?>/images/logo.svg" alt="<?= SITE_NAME; ?>"
+						<img src="<?= INCLUDE_PATH; ?>/images/logo.svg" width="289" height="65" alt="<?= SITE_NAME; ?>"
 						     title="<?= SITE_NAME; ?>"/>
 					</a>
 					<div class="clear"></div>
@@ -211,7 +211,7 @@
 				<div class="header_desktop_logo">
 					<h1>
 						<a href="<?= BASE; ?>" title="<?= SITE_NAME; ?>">
-							<img src="<?= INCLUDE_PATH; ?>/images/logo.svg" alt="<?= SITE_NAME; ?>" title="<?=
+							<img src="<?= INCLUDE_PATH; ?>/images/logo.svg" width="289" height="65" alt="<?= SITE_NAME; ?>" title="<?=
                                 SITE_NAME; ?>"/>
 						</a>
 					</h1>

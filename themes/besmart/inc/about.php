@@ -23,8 +23,8 @@
 				</div>
 				<div class='image'>
 					<img src='<?= INCLUDE_PATH ?>/images/about/about-image-720.webp'
-					     srcset='<?= INCLUDE_PATH ?>/images/about/about-image-480.webp 480w, <?= INCLUDE_PATH ?>/images/about/about-image-720.webp 720w, <?= INCLUDE_PATH ?>/images/about/about-image.webp 1024w'
-					     sizes='(min-width: 992px) 35vw, 90vw' width='1024' height='768'
+					     srcset='<?= INCLUDE_PATH ?>/images/about/about-image-480.webp 480w, <?= INCLUDE_PATH ?>/images/about/about-image-560.webp 560w, <?= INCLUDE_PATH ?>/images/about/about-image-720.webp 720w, <?= INCLUDE_PATH ?>/images/about/about-image.webp 1024w'
+					     sizes='(min-width: 992px) 35vw, 76vw' width='1024' height='768'
 					     loading='lazy' decoding='async' alt='Be Smart'>
 				</div>
 			</article>

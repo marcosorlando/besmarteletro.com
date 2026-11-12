@@ -203,20 +203,38 @@
                         __DIR__ . '/' . $file
                     ) ? '?v=' . filemtime(__DIR__ . '/' . $file) : '');
             ?>
-			<link rel="stylesheet" href="<?= $wcAsset('_cdn/bootcss/reset.min.css'); ?>"/>
-			<link rel="stylesheet" href="<?= $wcAsset('_cdn/bootcss/fonticon.min.css'); ?>"/>
-			<link rel="stylesheet" href="<?= $wcAsset('_cdn/bootcss/font-awesome.min.css'); ?>"/>
-			<link rel="stylesheet" href="<?= $wcAsset('_cdn/bootcss/font-awesome-animation.min.css'); ?>"/>
-			<link rel="stylesheet" href="<?= $wcAsset('_cdn/owl.carousel.min.css'); ?>"/>
-			<link rel="stylesheet" href="<?= $wcAsset('_cdn/owl.theme.default.min.css'); ?>"/>
-			<link rel="stylesheet" href="<?= $wcAsset('_cdn/jquery-ui.min.css'); ?>"/>
-			<link rel="stylesheet" href="<?= $wcAsset('_cdn/widgets/filter/filter.min.css'); ?>"/>
-			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"/>
+            <?php
+                // CSS em um arquivo só: no 4G cada folha bloqueante custava um round-trip (11 folhas + CDN do
+                // animate.css somavam 5 s de bloqueio no PageSpeed mobile). A ordem abaixo é a ordem da cascata.
+                $wcCssFiles = [
+                    '_cdn/bootcss/reset.min.css',
+                    '_cdn/bootcss/fonticon.min.css',
+                    '_cdn/bootcss/font-awesome.min.css',
+                    '_cdn/bootcss/font-awesome-animation.min.css',
+                    '_cdn/owl.carousel.min.css',
+                    '_cdn/owl.theme.default.min.css',
+                    '_cdn/jquery-ui.min.css',
+                    '_cdn/widgets/filter/filter.min.css',
+                    'themes/' . THEME . '/_css/animate.min.css', // mesma versão 3.7.2 que vinha da cdnjs
+                    'themes/' . THEME . '/style.min.css',
+                    'themes/' . THEME . '/_css/responsive.min.css',
+                ];
+                $wcCssBundle = require __DIR__ . '/_cdn/css-bundle.php';
+                $wcCssHref = $wcCssBundle(__DIR__, $wcCssFiles, '_cdn/bundle');
+                if (null !== $wcCssHref) {
+                    echo "<link rel='stylesheet' href='" . BASE . '/' . $wcCssHref . "'/>\r\n";
+                } else {
+                    // sem permissão de escrita em _cdn/bundle: volta para as folhas separadas
+                    foreach ($wcCssFiles as $wcCssFile) {
+                        echo "<link rel='stylesheet' href='" . $wcAsset($wcCssFile) . "'/>\r\n";
+                    }
+                }
 
-			<link rel='stylesheet' href='<?= $wcAsset('themes/' . THEME . '/style.min.css'); ?>'/>
-			<link rel='stylesheet' href='<?= $wcAsset('themes/' . THEME . '/_css/responsive.min.css'); ?>'/>
-
-			<script src="<?= $wcAsset('_cdn/jquery.js'); ?>"></script>
+                // defer em todo o JS (este e os do fim do <body>): baixam em paralelo sem bloquear a pintura e
+                // executam na ordem em que aparecem, antes do DOMContentLoaded. Não há $() inline nos templates;
+                // um script inline com jQuery (ex.: WorkControl Codes) precisa esperar o DOMContentLoaded.
+            ?>
+			<script src="<?= $wcAsset('_cdn/jquery.js'); ?>" defer></script>
 
 			<!-- Facebook Pixel Code -->
             <?php
@@ -558,11 +576,11 @@
         }*/
         ?>
 
-		<script src='<?= $wcAsset('_cdn/workcontrol.min.js'); ?>'></script>
-		<script src='<?= $wcAsset('_cdn/owl.carousel.min.js'); ?>'></script>
-		<script src='<?= $wcAsset('_cdn/jquery-ui.min.js'); ?>'></script>
-		<script src='<?= $wcAsset('_cdn/jquery.zoom.min.js'); ?>'></script>
-		<script src='<?= $wcAsset('_cdn/widgets/filter/filter.min.js'); ?>'></script>
+		<script src='<?= $wcAsset('_cdn/workcontrol.min.js'); ?>' defer></script>
+		<script src='<?= $wcAsset('_cdn/owl.carousel.min.js'); ?>' defer></script>
+		<script src='<?= $wcAsset('_cdn/jquery-ui.min.js'); ?>' defer></script>
+		<script src='<?= $wcAsset('_cdn/jquery.zoom.min.js'); ?>' defer></script>
+		<script src='<?= $wcAsset('_cdn/widgets/filter/filter.min.js'); ?>' defer></script>
 
         <?php
             // WC THEME JS FILES | cada script uma única vez: usa o .min.js quando existir, senão o .js
@@ -580,12 +598,12 @@
                 foreach ($wcJsThemeLoad as $wcJsThemeFiles) {
                     echo '<script src="' . $wcAsset(
                             'themes/' . THEME . '/_js/' . $wcJsThemeFiles
-                        ) . '"></script>' . "\r\n";
+                        ) . '" defer></script>' . "\r\n";
                 }
             }
             // MAIN SCRIPT THEME
             if (file_exists('themes/' . THEME . '/scripts.js')) {
-                echo '<script src="' . $wcAsset('themes/' . THEME . '/scripts.min.js') . '"></script>' . "\r\n";
+                echo '<script src="' . $wcAsset('themes/' . THEME . '/scripts.min.js') . '" defer></script>' . "\r\n";
             }
         ?>
 		<!--ACCESS-->
