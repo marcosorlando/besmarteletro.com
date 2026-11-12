@@ -40,6 +40,7 @@ if ($SvcId) {
     ];
     $Create->exeCreate(DB_SVC, $SvcCreate);
     header('Location: dashboard.php?wc=services/create&id=' . $Create->getResult());
+    exit;
 }
 
 $Search = filter_input_array(INPUT_POST);

@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use function curl_close;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
@@ -54,7 +53,6 @@ class Instagram
         curl_setopt($ch, CURLOPT_TIMEOUT, 12);
 
         $response = curl_exec($ch);
-        curl_close($ch);
 
         if (false === $response) {
             return null;

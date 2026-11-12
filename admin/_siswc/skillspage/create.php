@@ -31,6 +31,7 @@ use App\Conn\Read;
         ];
         $Create->exeCreate(DB_SKILLSPAGE, $skillCreate);
         header('Location: dashboard.php?wc=skillspage/create&id=' . $Create->getResult());
+        exit;
     endif;
 ?>
 

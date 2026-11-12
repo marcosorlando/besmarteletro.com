@@ -61,7 +61,7 @@ if (DB_AUTO_TRASH) {
                     <p>{$Coupon['cp_title']}</p>
                     <p>Início: " . date("d.m.Y \a\s H\hi", strtotime($Coupon['cp_start'])) . "</p>
                     <p>Término: " . date("d.m.Y \a\s H\hi", strtotime($Coupon['cp_end'])) . "</p>
-                    <p>Ativações: " . str_pad($Coupon['cp_hits'], 4, 0, 0) . "</p>
+                    <p>Ativações: " . str_pad((string)($Coupon['cp_hits'] ?? 0), 4, '0', STR_PAD_LEFT) . "</p>
                 </header>
                 <a title='Editar Cupom!' href='dashboard.php?wc=products/coupon&id={$Coupon['cp_id']}' class='btn btn_blue icon-pencil icon-notext'></a>
                 <span rel='product_coupon' class='j_delete_action btn btn_red icon-cancel-circle icon-notext' id='{$Coupon['cp_id']}'></span>

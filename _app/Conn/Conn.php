@@ -143,9 +143,14 @@ class Conn
     }
 
     /**
-     * Método wakeup privado para prevenir desserialização.
+     * Impede a desserialização do singleton (substitui o __wakeup, soft-deprecated no PHP 8.5).
+     *
+     * @param array<mixed> $data
      */
-    public function __wakeup(): void { }
+    public function __unserialize(array $data): void
+    {
+        throw new \LogicException('Conn não pode ser desserializada.');
+    }
 
     /**
      * Método clone privado para prevenir clonagem da classe.

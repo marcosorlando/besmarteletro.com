@@ -39,6 +39,7 @@ if ($Search && (isset($Search['s']) || isset($Search['status']))) {
     $S = (isset($Search['s']) ? urlencode($Search['s']) : $S);
     $SearchCat = (empty($Search['searchcat']) ? null : $Search['searchcat']);
     header(sprintf('Location: dashboard.php?wc=partners/home&s=%s&cat=%s&tag=%s', $S, $SearchCat, $T));
+    exit;
 }
 ?>
 

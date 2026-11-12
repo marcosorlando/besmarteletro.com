@@ -1,48 +1,51 @@
 <?php
 
-use App\Conn\Create;
-use App\Conn\Read;
-use App\Helpers\Check;
+    use App\Conn\Create;
+    use App\Conn\Read;
+    use App\Helpers\Check;
 
 
-	$AdminLevel = LEVEL_WC_PRODUCTS;
-	if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
-		exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-	}
+    $AdminLevel = LEVEL_WC_PRODUCTS;
+    if (!APP_PDT || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+        exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+    }
 
-	// AUTO INSTANCE OBJECT READ
-	if (empty($Read)) {
-		$Read ??= new Read();
-	}
+    // AUTO INSTANCE OBJECT READ
+    if (empty($Read)) {
+        $Read ??= new Read();
+    }
 
-	// AUTO INSTANCE OBJECT CREATE
-	if (empty($Create)) {
-		$Create ??= new Create();
-	}
+    // AUTO INSTANCE OBJECT CREATE
+    if (empty($Create)) {
+        $Create ??= new Create();
+    }
 
-	$PdtId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-	if ($PdtId) {
-		$Read->exeRead(DB_PDT, "WHERE pdt_id = :id", "id={$PdtId}");
-		if ($Read->getResult()) {
-			$FormData = array_map(static fn($value) => Check::safeHtmlChars($value), $Read->getResult()[0]);
-			extract($FormData);
-			//AUX. VALIDA PDF
-			$pdtPDF = (!empty($pdt_drawing) ? BASE . "/uploads/{$pdt_drawing}" : null);
-		} else {
-			$_SESSION['trigger_controll'] = "<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um produto que não existe ou que foi removido recentemente!";
-			header('Location: dashboard.php?wc=products/home');
-			exit;
-		}
-	} else {
-
-		$PdtCreate = [
-			'pdt_created' => date('Y-m-d H:i:s'),
-			'pdt_status' => 0
-		];
-		$Create->exeCreate(DB_PDT, $PdtCreate);
-		header('Location: dashboard.php?wc=products/create&id=' . $Create->getResult());
-
-	}
+    $PdtId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+    if ($PdtId) {
+        $Read->exeRead(DB_PDT, "WHERE pdt_id = :id", "id={$PdtId}");
+        if ($Read->getResult()) {
+            $FormData = array_map(static fn($value) => Check::safeHtmlChars(null === $value ? null : (string)$value),
+                $Read->getResult()[0]);
+            extract($FormData);
+            //AUX. VALIDA PDF
+            $pdtPDFExists = (!empty($pdt_drawing) && file_exists("../uploads/{$pdt_drawing}") && !is_dir(
+                    "../uploads/{$pdt_drawing}"
+                ));
+            $pdtPDF = ($pdtPDFExists ? BASE . "/uploads/{$pdt_drawing}" : null);
+        } else {
+            $_SESSION['trigger_controll'] = "<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um produto que não existe ou que foi removido recentemente!";
+            header('Location: dashboard.php?wc=products/home');
+            exit;
+        }
+    } else {
+        $PdtCreate = [
+            'pdt_created' => date('Y-m-d H:i:s'),
+            'pdt_status' => 0
+        ];
+        $Create->exeCreate(DB_PDT, $PdtCreate);
+        header('Location: dashboard.php?wc=products/create&id=' . $Create->getResult());
+        exit;
+    }
 
 ?>
 
@@ -107,25 +110,25 @@ use App\Helpers\Check;
 			<div class="box_content">
 				<label class="label">
 					<span class="legend">Produto:</span>
-					<input style="font-size: 1.4em;" type="text" name="pdt_title" value="<?= $pdt_title; ?>"
+					<input class="font_big" type="text" name="pdt_title" value="<?= $pdt_title; ?>"
 					       placeholder="Nome do Produto:" required/>
 				</label>
 
 				<label class="label">
 					<span class="legend">Breve Descrição (SEO):</span>
-					<textarea style="font-size: 1.2em;" name="pdt_subtitle" rows="3"
+					<textarea class="font_medium" name="pdt_subtitle" rows="3"
 					          required><?= $pdt_subtitle; ?></textarea>
 				</label>
 
-				<?php
-					if (APP_LINK_PRODUCTS) { ?>
+                <?php
+                    if (APP_LINK_PRODUCTS) { ?>
 						<label class="label">
 							<span class="legend">Link Alternativo (Opcional):</span>
 							<input type="text" name="pdt_name" value="<?= $pdt_name; ?>"
 							       placeholder="Link do Produto:"/>
 						</label>
-					<?php
-					} ?>
+                        <?php
+                    } ?>
 
 				<!----------------------------------
 				 ######## CUSTOM BY ALISSON #########
@@ -139,25 +142,25 @@ use App\Helpers\Check;
 
 					<label class='label'>
 						<span class='legend'>Voltagem (110/220V):</span>
-						<?php
-							echo "<select name='pdt_voltage' required>";
-							echo "<option value='' selected disabled>Selecione a voltagem</option>";
+                        <?php
+                            echo "<select name='pdt_voltage' required>";
+                            echo "<option value='' selected disabled>Selecione a voltagem</option>";
 
-							foreach (getWcVoltage() as $key => $value) {
-								echo "<option " . ($pdt_voltage == $key ? 'selected' : '') . " 
-									value='{$key}'>{$value}</option>";
-							}
-							echo '</select>';
+                            foreach (Check::getWcVoltage() as $key => $value) {
+                                echo "<option " . ('' !== $pdt_voltage && (int)$pdt_voltage === $key ? 'selected' : '') . " value='{$key}'>{$value}</option>";
+                            }
+                            echo '</select>';
 
-						?>
+                        ?>
 					</label>
 
 					<label class="label">
 						<span class="legend">Modelo:</span>
 						<input type="text" name="pdt_model" value="<?= $pdt_model ?>" placeholder="Modelo:" required/>
 					</label>
-
 				</div>
+
+				<div class="clear"></div>
 
 				<div class="label_50">
 
@@ -166,94 +169,108 @@ use App\Helpers\Check;
 						<span class='category_selection_title j_open_category_selection'>
                         <?php
 
-	                        if (empty($pdt_subcategory)) {
-		                        echo 'Selecione a(s) Categoria(s)';
-	                        } else {
-		                        $Read->fullRead('SELECT cat_title FROM ' . DB_PDT_CATS . ' WHERE FIND_IN_SET(cat_id, :category) ORDER BY cat_title ASC',
-			                        "category={$pdt_subcategory}");
-		                        if ($Read->getResult()) {
-			                        $cats = [];
-			                        foreach ($Read->getResult() as $PDT) {
-				                        $cats[] = $PDT['cat_title'];
-			                        }
+                            if (empty($pdt_subcategory)) {
+                                echo 'Selecione a(s) Categoria(s)';
+                            } else {
+                                $Read->fullRead(
+                                    'SELECT cat_title FROM ' . DB_PDT_CATS . ' WHERE FIND_IN_SET(cat_id, :category) ORDER BY cat_title ASC',
+                                    "category={$pdt_subcategory}"
+                                );
+                                if ($Read->getResult()) {
+                                    $cats = [];
+                                    foreach ($Read->getResult() as $PDT) {
+                                        $cats[] = $PDT['cat_title'];
+                                    }
 
-			                        echo implode(', ', $cats);
-		                        }
-	                        }
+                                    echo implode(', ', $cats);
+                                }
+                            }
                         ?>
                     </span>
 
 						<div class="category_selection_content j_category_selection_content">
-							<?php
+                            <?php
 
-								$Read->fullRead('SELECT cat_id, cat_parent, cat_title FROM ' . DB_PDT_CATS . ' WHERE cat_parent IS NULL ORDER BY cat_title ASC');
+                                $Read->fullRead(
+                                    'SELECT cat_id, cat_parent, cat_title FROM ' . DB_PDT_CATS . ' WHERE cat_parent IS NULL ORDER BY cat_title ASC'
+                                );
 
-								function loopCat()
-								{
-									global $Read, $pdt_subcategory;
-									if ($Read->getResult()) {
-										foreach ($Read->getResult() as $CAT) {
-											$Read->fullRead('SELECT cat_id, cat_parent, cat_title FROM ' . DB_PDT_CATS . ' WHERE cat_parent = :parent ORDER BY cat_title ASC',
-												"parent={$CAT['cat_id']}");
-											$checked = (!empty($pdt_subcategory) && in_array($CAT['cat_id'],
-												explode(',', $pdt_subcategory)) ? ' checked="checked"' : '');
+                                function loopCat()
+                                {
 
-											echo '<li>';
-											echo '<span>';
-											echo "<i class='" . ($Read->getResult() ? 'icon-plus icon-notext' : 'icon-minus icon-notext') . "'></i>";
-											echo "<input id='checkbox-category-{$CAT['cat_id']}' class='j_category_selection multiple' type='checkbox' name='pdt_subcategory[]' value='{$CAT['cat_id']}' data-title='{$CAT['cat_title']}'" . (empty($CAT['cat_parent']) ? ' disabled="disabled"' : '') . $checked . '/>';
-											echo '<label' . (empty($CAT['cat_parent']) ? ' class="disabled"' : '') . " for='checkbox-category-{$CAT['cat_id']}'>{$CAT['cat_title']}</label>";
-											echo '</span>';
+                                    global $Read, $pdt_subcategory;
+                                    if ($Read->getResult()) {
+                                        foreach ($Read->getResult() as $CAT) {
+                                            $Read->fullRead(
+                                                'SELECT cat_id, cat_parent, cat_title FROM ' . DB_PDT_CATS . ' WHERE cat_parent = :parent ORDER BY cat_title ASC',
+                                                "parent={$CAT['cat_id']}"
+                                            );
+                                            $checked = (!empty($pdt_subcategory) && in_array(
+                                                $CAT['cat_id'],
+                                                explode(',', $pdt_subcategory)
+                                            ) ? ' checked="checked"' : '');
 
-											if ($Read->getResult()) {
-												echo '<ul>';
-												loopCat();
-												echo '</ul>';
-											}
-											echo '</li>';
-										}
-									}
-								}
+                                            echo '<li>';
+                                            echo '<span>';
+                                            echo "<i class='" . ($Read->getResult() ? 'icon-plus icon-notext' : 'icon-minus icon-notext') . "'></i>";
+                                            echo "<input id='checkbox-category-{$CAT['cat_id']}' class='j_category_selection multiple' type='checkbox' name='pdt_subcategory[]' value='{$CAT['cat_id']}' data-title='{$CAT['cat_title']}'" . (empty($CAT['cat_parent']) ? ' disabled="disabled"' : '') . $checked . '/>';
+                                            echo '<label' . (empty($CAT['cat_parent']) ? ' class="disabled"' : '') . " for='checkbox-category-{$CAT['cat_id']}'>{$CAT['cat_title']}</label>";
+                                            echo '</span>';
 
-								echo '<ul>';
-								loopCat();
-								echo '</ul>';
-							?>
+                                            if ($Read->getResult()) {
+                                                echo '<ul>';
+                                                loopCat();
+                                                echo '</ul>';
+                                            }
+                                            echo '</li>';
+                                        }
+                                    }
+                                }
+
+                                echo '<ul>';
+                                loopCat();
+                                echo '</ul>';
+                            ?>
 						</div>
 					</label>
 
 					<label class='label'>
 						<span class='legend'>Linha:</span>
-						<?php
-							$Read->exeRead(DB_PDT_LINES, 'ORDER BY line_title ASC');
-							if (!$Read->getResult()) {
-								echo Check::erro("<span class='icon-warning'>Cadastre algumas <b>linhas de produtos</b> antes de começar!</span>",
-									E_USER_WARNING);
-							} else {
-								echo "<select name='pdt_line' required>";
-								echo "<option value=''>Selecione uma Linha</option>";
-								foreach ($Read->getResult() as $Line) {
-									echo '<option';
-									if ($pdt_line == $Line['line_id']) {
-										echo " selected='selected'";
-									}
-									echo " value='{$Line['line_id']}'>{$Line['line_title']}</option>";
-								}
+                        <?php
+                            $Read->exeRead(DB_PDT_LINES, 'ORDER BY line_title ASC');
+                            if (!$Read->getResult()) {
+                                echo Check::erro(
+                                    "<span class='icon-warning'>Cadastre algumas <b>linhas de produtos</b> antes de começar!</span>",
+                                    E_USER_WARNING
+                                );
+                            } else {
+                                echo "<select name='pdt_line' required>";
+                                echo "<option value=''>Selecione uma Linha</option>";
+                                foreach ($Read->getResult() as $Line) {
+                                    echo '<option';
+                                    if ($pdt_line == $Line['line_id']) {
+                                        echo " selected='selected'";
+                                    }
+                                    echo " value='{$Line['line_id']}'>{$Line['line_title']}</option>";
+                                }
 
-								echo '</select>';
-							}
-						?>
+                                echo '</select>';
+                            }
+                        ?>
 					</label>
 
 				</div>
 
-				<label class="label">
-					<span class="legend">Descrição do Produto:</span>
-					<textarea name="pdt_content" class="work_mce" rows="20"><?= $pdt_content; ?></textarea>
-				</label>
 
 				<div class="clear"></div>
 
+			</div>
+
+			<div class='panel_header default'>
+				<h2>DESCRIÇÃO DO PRODUTO:</h2>
+				<label class='label'>
+					<textarea name='pdt_content' class='work_mce' rows='20'><?= $pdt_content; ?></textarea>
+				</label>
 			</div>
 		</div>
 
@@ -264,27 +281,31 @@ use App\Helpers\Check;
 					<input type="file" class="wc_loadimage" name="pdt_cover"/>
 				</label>
 			</div>
-			<?php
+            <?php
 
-				$Image = (file_exists("../uploads/{$pdt_cover}") && !is_dir("../uploads/{$pdt_cover}") ? "uploads/{$pdt_cover}" : 'admin/_img/no_image.jpg');
-			?>
+                $Image = (file_exists("../uploads/{$pdt_cover}") && !is_dir(
+                    "../uploads/{$pdt_cover}"
+                ) ? "uploads/{$pdt_cover}" : 'admin/_img/no_image.jpg');
+            ?>
 			<img class="pdt_cover" alt="Capa do Produto" title="Capa do Produto"
 			     src="../tim.php?src=<?= $Image; ?>&w=<?= THUMB_W; ?>&h=<?= THUMB_H; ?>"
 			     default="../tim.php?src=<?= $Image; ?>&w=<?= THUMB_W; ?>&h=<?= THUMB_H; ?>">
-			<?php
+            <?php
 
-				$Read->exeRead(DB_PDT_GALLERY, "WHERE product_id = :id", "id={$pdt_id}");
-				if ($Read->getResult()) {
-					echo '<div class="pdt_images gallery pdt_single_image">';
-					foreach ($Read->getResult() as $Image) {
-						$ImageUrl = ($Image['image'] && file_exists("../uploads/{$Image['image']}") && !is_dir("../uploads/{$Image['image']}") ? "../uploads/{$Image['image']}" : '_img/no_image.jpg');
-						echo "<img rel='Products' id='{$Image['id']}' alt='Imagem em {$pdt_title}' title='Imagem em {$pdt_title}' src='{$ImageUrl}'/>";
-					}
-					echo '</div>';
-				} else {
-					echo '<div class="pdt_images gallery pdt_single_image"></div>';
-				}
-			?>
+                $Read->exeRead(DB_PDT_GALLERY, "WHERE product_id = :id", "id={$pdt_id}");
+                if ($Read->getResult()) {
+                    echo '<div class="pdt_images gallery pdt_single_image">';
+                    foreach ($Read->getResult() as $Image) {
+                        $ImageUrl = ($Image['image'] && file_exists("../uploads/{$Image['image']}") && !is_dir(
+                            "../uploads/{$Image['image']}"
+                        ) ? "../uploads/{$Image['image']}" : '_img/no_image.jpg');
+                        echo "<img rel='Products' id='{$Image['id']}' alt='Imagem em {$pdt_title}' title='Imagem em {$pdt_title}' src='{$ImageUrl}'/>";
+                    }
+                    echo '</div>';
+                } else {
+                    echo '<div class="pdt_images gallery pdt_single_image"></div>';
+                }
+            ?>
 
 			<div class="box_content">
 
@@ -296,15 +317,14 @@ use App\Helpers\Check;
 
 				<label class="label">
                         <span class="legend">
-                            <a href="<?= $pdtPDF ?>" target="_blank" title="Visualizar"> <i
-			                            class="icon-file-pdf <?= !empty($pdt_drawing) && !is_dir($pdtPDF) ? 'font_green' : 'font_red' ?>"></i></a>Desenho Técnico (PDF - máx. 5mb): </span>
-					<input type="file" class="wc_load_pdf" name="pdt_drawing"
-					       value="<?= ($pdt_drawing ? $pdt_drawing : ''); ?>"/>
+                            <?= ($pdtPDF ? "<a href='{$pdtPDF}' target='_blank' title='Visualizar'>" : ''); ?> <i
+			                        class="icon-file-pdf <?= $pdtPDFExists ? 'font_green' : 'font_red' ?>"></i><?= ($pdtPDF ? '</a>' : ''); ?>Desenho Técnico (PDF - máx. 5mb): </span>
+					<input type="file" class="wc_load_pdf" name="pdt_drawing" accept="application/pdf"/>
 				</label>
 
 				<div class="wc_actions">
 					<span><b>MOSTRAR EM DESTAQUE:</b></span>
-					<?= switchYesNo('pdt_destaque', $pdt_destaque); ?>
+                    <?= Check::switchOnOff('pdt_destaque', $pdt_destaque, null, 'SIM', 'NÃO'); ?>
 				</div>
 
 				<div id="period" class="ds_none">
@@ -312,8 +332,10 @@ use App\Helpers\Check;
 					<label class='label'>
 						<span class='legend'><b class='font_red'>* </b>Início da Divulgação:</span>
 						<input type='text' class='formTime jwc_datepicker' data-timepicker='true' name='pdt_offer_start'
-						       value="<?= ($pdt_offer_start ? date('d/m/Y H:i',
-							       strtotime($pdt_offer_start)) : null); ?>"/>
+						       value="<?= ($pdt_offer_start ? date(
+                                   'd/m/Y H:i',
+                                   strtotime($pdt_offer_start)
+                               ) : null); ?>"/>
 					</label>
 
 					<label class='label'>
@@ -324,7 +346,7 @@ use App\Helpers\Check;
 				</div>
 
 				<div class="wc_actions">
-					<?= switchOnOff('pdt_status', $pdt_status); ?>
+                    <?= Check::switchOnOff('pdt_status', $pdt_status); ?>
 					<button name="public" value="1" class="btn btn_save">
 						<img class='form_load' alt='Enviando Requisição!' title='Enviando Requisição!'
 						     src='_img/load_w.gif'/> Salvar

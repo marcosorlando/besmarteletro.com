@@ -39,16 +39,18 @@ use App\Models\Pager;
         $Create ??= new Create();
     }
 
-    $S = filter_input(INPUT_GET, "s", FILTER_DEFAULT);
+    $S = trim((string)filter_input(INPUT_GET, "s", FILTER_DEFAULT));
     $O = filter_input(INPUT_GET, "opt", FILTER_DEFAULT);
 
-    $WhereString = (!empty($S) ? " AND (pdt_title LIKE '%{$S}%' OR pdt_content LIKE '%{$S}%' OR pdt_code = '{$S}') " : "");
-    $WhereOpt = ((!empty($O) && $O == 'outsale') ? " AND pdt_status != 1 " : "");
+    // Termo vai por placeholder (:s), nunca concatenado no SQL
+    $WhereString = ('' !== $S ? " AND (pdt_title LIKE '%' :s '%' OR pdt_content LIKE '%' :s '%' OR pdt_code = :s) " : "");
+    $WhereParse = ('' !== $S ? '&' . http_build_query(['s' => $S]) : '');
+    $WhereOpt = ($O == 'outsale' ? " AND pdt_status != 1 " : "");
 
     $Search = filter_input_array(INPUT_POST);
     if ($Search) {
-        $S = urlencode($Search['s']);
-        $O = urlencode($Search['opt']);
+        $S = urlencode(trim((string)($Search['s'] ?? '')));
+        $O = urlencode((string)($Search['opt'] ?? ''));
         header("Location: dashboard.php?wc=products/home&opt={$O}&s={$S}");
         exit;
     }
@@ -67,7 +69,7 @@ use App\Models\Pager;
 
     <div class="dashboard_header_search">
         <form name="searchPosts" action="" method="post" enctype="multipart/form-data" class="ajax_off">
-            <input type="search" name="s" placeholder="Pesquisar:" style="width: 38%; margin-right: 3px;"/>
+            <input type="search" name="s" value="<?= Check::safeHtmlChars($S); ?>" placeholder="Pesquisar:" style="width: 38%; margin-right: 3px;"/>
             <select name="opt" style="width: 45%; margin-right: 3px; padding: 5px 10px">
                 <option value="">Todos</option>
                 <option <?= ($O == 'outsale' ? "selected='selected'" : ''); ?> value="outsale">Indisponíveis</option>
@@ -80,19 +82,21 @@ use App\Models\Pager;
 <div class="dashboard_content">
     <?php
 
-        $RedirectOpt = (!empty($WhereOpt) ? "&opt=outsale" : "");
+        $RedirectOpt = (!empty($WhereOpt) ? "&opt=outsale" : "") . ('' !== $S ? '&s=' . urlencode($S) : '');
         $Page = (int) filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT);
         $Pager = new Pager("dashboard.php?wc=products/home{$RedirectOpt}&page=", "<<", ">>", 5);
         $Pager->exePager($Page, 12);
-        $Read->exeRead(DB_PDT, "WHERE 1 = 1 $WhereString $WhereOpt ORDER BY pdt_created DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
+        $Read->exeRead(DB_PDT, "WHERE 1 = 1 {$WhereString} {$WhereOpt} ORDER BY pdt_created DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}{$WhereParse}");
         if (!$Read->getResult()) {
             $Pager->returnPage();
-            echo Check::erro("<span class='al_center icon-notification'>Ainda não existem produtos cadastrados {$Admin['user_name']}. Comece agora mesmo criando seu primeiro produto!</span>", E_USER_NOTICE);
+            echo Check::erro(('' !== $S || $WhereOpt
+                ? "<span class='al_center icon-notification'>Nenhum produto encontrado para este filtro, {$Admin['user_name']}.</span>"
+                : "<span class='al_center icon-notification'>Ainda não existem produtos cadastrados {$Admin['user_name']}. Comece agora mesmo criando seu primeiro produto!</span>"), E_USER_NOTICE);
         } else {
             foreach ($Read->getResult() as $Products) {
                 extract($Products);
                 $PdtImage = ($pdt_cover && file_exists("../uploads/{$pdt_cover}") && !is_dir("../uploads/{$pdt_cover}") ? "uploads/{$pdt_cover}" : 'admin/_img/no_image.jpg');
-                $PdtTitle = ($pdt_title ? Check::chars($pdt_title, 45) : 'Edite este produto para coloca-lo a venda!');
+                $PdtTitle = Check::safeHtmlChars($pdt_title ? Check::chars($pdt_title, 45) : 'Edite este produto para coloca-lo a venda!');
                 $PdtCode = ($pdt_code ? $pdt_code : 'indefinido');
                 $PdtClass = ($pdt_status != 1 ? 'inactive' : '');
 
@@ -150,7 +154,7 @@ use App\Models\Pager;
             </div>
         </article>";
             }
-            $Pager->exePaginator(DB_PDT, "WHERE 1 = 1 {$WhereString} {$WhereOpt}");
+            $Pager->exePaginator(DB_PDT, "WHERE 1 = 1 {$WhereString} {$WhereOpt}", ltrim($WhereParse, '&'));
             echo $Pager->getPaginator();
 
         }

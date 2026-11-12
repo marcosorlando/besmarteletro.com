@@ -27,11 +27,13 @@ if ($DepositionId) {
             $Admin['user_name']
         );
         \header('Location: dashboard.php?wc=depositions/home');
+        exit;
     }
 } else {
     $DepositionCreate = ['depositions_date' => \date('Y-m-d H:i:s')];
     $Create->exeCreate(DB_DEPOSITIONS, $DepositionCreate);
     \header('Location: dashboard.php?wc=depositions/create&id='.$Create->getResult());
+    exit;
 }
 ?>
 

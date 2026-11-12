@@ -111,8 +111,8 @@ if ($CatId) {
                                     echo "<li>";
                                     echo "<span>";
                                     echo "<i class='" . ($Read->getResult() ? "icon-plus icon-notext" : "icon-minus icon-notext") . "'></i>";
-                                    echo "<input id='radio-category-{$CAT['cat_id']}' class='j_category_selection' type='radio' name='cat_parent' value='{$CAT['cat_id']}' data-title='{$CAT['cat_title']}'" . ($CAT['cat_id'] == $cat_id || $CAT['cat_parent'] == $cat_id || in_array($cat_id, explode(',', $CAT['cat_tree'])) ? ' disabled="disabled"' : '') . ($CAT['cat_id'] == $cat_parent ? ' checked="checked"' : '') . "/>";
-                                    echo "<label" . ($CAT['cat_id'] == $cat_id || $CAT['cat_parent'] == $cat_id || in_array($cat_id, explode(',', $CAT['cat_tree'])) ? ' class="disabled"' : '') . " for='radio-category-{$CAT['cat_id']}'>{$CAT['cat_title']}</label>";
+                                    echo "<input id='radio-category-{$CAT['cat_id']}' class='j_category_selection' type='radio' name='cat_parent' value='{$CAT['cat_id']}' data-title='{$CAT['cat_title']}'" . ($CAT['cat_id'] == $cat_id || $CAT['cat_parent'] == $cat_id || in_array($cat_id, explode(',', (string)$CAT['cat_tree'])) ? ' disabled="disabled"' : '') . ($CAT['cat_id'] == $cat_parent ? ' checked="checked"' : '') . "/>";
+                                    echo "<label" . ($CAT['cat_id'] == $cat_id || $CAT['cat_parent'] == $cat_id || in_array($cat_id, explode(',', (string)$CAT['cat_tree'])) ? ' class="disabled"' : '') . " for='radio-category-{$CAT['cat_id']}'>{$CAT['cat_title']}</label>";
                                     echo "</span>";
 
                                     if ($Read->getResult()) {

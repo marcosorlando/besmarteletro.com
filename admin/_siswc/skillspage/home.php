@@ -24,6 +24,7 @@ use App\Models\Pager;
     if ($Search && $Search['s']):
         $S = urlencode($Search['s']);
         header("Location: dashboard.php?wc=skillspage/search&s={$S}");
+        exit;
     endif;
 ?>
 

@@ -199,13 +199,13 @@ class Pager
 
         $html = "<ul class='paginator pagination'>";
 
-        // Primeira
+        // Primeira | o rótulo pode trazer HTML de ícone (ex.: <i class='fa fa-angle-left'></i>), definido no código
         $html .= sprintf(
             '<li><a title="%s" href="%s1%s">%s</a></li>',
-            htmlspecialchars($this->first, ENT_QUOTES, 'UTF-8'),
+            $this->labelTitle($this->first, 'Primeira página'),
             $this->link,
             $hash,
-            htmlspecialchars($this->first, ENT_QUOTES, 'UTF-8')
+            $this->labelHtml($this->first)
         );
 
         // Anteriores
@@ -223,7 +223,7 @@ class Pager
         }
 
         // Atual
-        $html .= sprintf('<li class="active"><a>%d</a></li>', $this->page);
+        $html .= sprintf('<li><span class="active">%d</span></li>', $this->page);
 
         // Próximas
         for ($i = $this->page + 1; $i <= $this->page + $maxLinks; ++$i) {
@@ -242,16 +242,36 @@ class Pager
         // Última
         $html .= sprintf(
             '<li><a title="%s" href="%s%d%s">%s</a></li>',
-            htmlspecialchars($this->last, ENT_QUOTES, 'UTF-8'),
+            $this->labelTitle($this->last, 'Última página'),
             $this->link,
             $totalPages,
             $hash,
-            htmlspecialchars($this->last, ENT_QUOTES, 'UTF-8')
+            $this->labelHtml($this->last)
         );
 
         $html .= '</ul>';
 
         $this->paginator = $html;
+    }
+
+    /**
+     * Conteúdo do link: mantém HTML de ícone; texto simples (ex.: "<<") é escapado.
+     */
+    private function labelHtml(string $label): string
+    {
+
+        return preg_match('/<[a-z][^>]*>/i', $label) ? $label : htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
+     * Texto do atributo title: o rótulo sem HTML, ou o padrão quando o rótulo é só ícone.
+     */
+    private function labelTitle(string $label, string $default): string
+    {
+
+        $text = trim(strip_tags($label));
+
+        return htmlspecialchars('' !== $text && !preg_match('/^[<>«»]+$/u', $text) ? $text : $default, ENT_QUOTES, 'UTF-8');
     }
 
     /**

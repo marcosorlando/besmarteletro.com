@@ -14,7 +14,7 @@ APP_URL=https://localhost/cli_travi
 APP_DEBUG=true
 APP_THEME=travi
 APP_TIMEZONE=America/Sao_Paulo
-APP_LOCALE=pt_BR
+APP_LANG=pt_BR
 
 # Configurações de banco de dados
 DB_HOST_DEV=localhost
@@ -286,5 +286,5 @@ para garantir que tudo está correto.
 ## [ROLLBACK]: COMO REVERTER
 
 - Cada etapa deve ser commitada separadamente.
-- Para rollback, reverta o(s) commit(s) correspondente(s) via `git revert`.
+- Para rollback, reverta o (s) commit (s) correspondente (s) via `git revert`.
 - Mantenha backup do banco de dados e arquivos antes de cada etapa crítica.

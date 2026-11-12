@@ -41,6 +41,7 @@ if ($CertId) {
     ];
     $Create->exeCreate(DB_CERT, $CertCreate);
     header('Location: dashboard.php?wc=certifications/create&id=' . $Create->getResult());
+    exit;
 }
 
 $Search = filter_input_array(INPUT_POST);

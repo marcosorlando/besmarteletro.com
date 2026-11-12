@@ -29,6 +29,7 @@
             ];
             $Create->exeCreate(DB_HOMEPAGE, $homeCreate);
             header('Location: dashboard.php?wc=homepage/create&id=' . $Create->getResult());
+            exit;
         endif;
     endif;
 ?>

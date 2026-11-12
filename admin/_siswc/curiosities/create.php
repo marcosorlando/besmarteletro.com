@@ -41,6 +41,7 @@ if ($CurId) {
     ];
     $Create->exeCreate(DB_CURIOSITIES, $curCreate);
     header('Location: dashboard.php?wc=curiosities/create&id=' . $Create->getResult());
+    exit;
 }
 
 ?>

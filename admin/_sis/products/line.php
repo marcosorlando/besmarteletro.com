@@ -49,12 +49,12 @@ use App\Helpers\Check;
 
 <header class="dashboard_header">
 	<div class="dashboard_header_title">
-		<h1 class="icon-list-numbered">Nova Linha</h1>
+		<h1 class="icon-list-numbered"><?= $line_title ?: 'Nova Linha'; ?></h1>
 		<p class="dashboard_header_breadcrumbs">
 			&raquo; <?= ADMIN_NAME; ?>
 			<span class="crumb">/</span>
 			<a title="<?= ADMIN_NAME; ?>" href="dashboard.php?wc=products/lines">Linhas</a>
-			<span class="crumb">/</span> Nova Linha
+			<span class="crumb">/</span> Gerenciar Linha
 		</p>
 	</div>
 </header>

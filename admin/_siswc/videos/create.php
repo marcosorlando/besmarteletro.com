@@ -27,11 +27,13 @@ if ($VideoId) {
             $Admin['user_name']
         );
         header('Location: dashboard.php?wc=videos/home');
+        exit;
     }
 } else {
     $VideoCreate = ['video_date' => date('Y-m-d H:i:s'), 'video_start' => date('Y-m-d H:i:s')];
     $Create->exeCreate(DB_YOUTUBE, $VideoCreate);
     header('Location: dashboard.php?wc=videos/create&id=' . $Create->getResult());
+    exit;
 }
 ?>
 

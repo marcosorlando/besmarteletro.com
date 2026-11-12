@@ -1,7 +1,9 @@
 <?php
 
+use App\Conn\Read;
+
 if (!empty($_SESSION['userLogin'])) {
-    $wcFbUserSection = \array_map('mb_strtolower', $_SESSION['userLogin']);
+    $wcFbUserSection = \array_map(static fn (mixed $value): string => \mb_strtolower((string) $value), $_SESSION['userLogin']);
     $wcFbUserSection['user_lastname'] = \substr(
         $wcFbUserSection['user_lastname'],
         \strrpos($wcFbUserSection['user_lastname'], ' ')
@@ -20,7 +22,7 @@ if (!empty($_SESSION['userLogin'])) {
         'id='.$wcFbUserSection['user_id']
     );
     if ($Read->getResult()) {
-        $wcFbUserAddr = \array_map('mb_strtolower', $Read->getResult()[0]);
+        $wcFbUserAddr = \array_map(static fn (mixed $value): string => \mb_strtolower((string) $value), $Read->getResult()[0]);
         $wcFbUserAddr['addr_zipcode'] = \str_replace(['.', '-'], '', $wcFbUserAddr['addr_zipcode']);
     }
 }

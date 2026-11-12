@@ -34,8 +34,9 @@
             }
 
             /* department */
-            if (!empty($getPost['pdt_department'])) {
-                $_SESSION['filter']['add']['pdt_department'] = \implode(',', $getPost['pdt_department']);
+            $Departments = \array_unique(\array_filter(\array_map('intval', (array)($getPost['pdt_department'] ?? []))));
+            if ($Departments) {
+                $_SESSION['filter']['add']['pdt_department'] = \implode(',', $Departments);
             }
 
             break;

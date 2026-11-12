@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Check;
+use App\Models\Pager;
 
 $WcImobiFilter = (empty($_SESSION['wc_imobi_filter']) ? null : $_SESSION['wc_imobi_filter']);
 unset($WcImobiFilter['min_price'], $WcImobiFilter['max_price'], $WcImobiFilter['realty_bedrooms']);

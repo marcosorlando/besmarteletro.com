@@ -27,7 +27,15 @@ if (empty($Update)) {
 }
 
 $PdtId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-$Read->exeRead(DB_PDT, "WHERE pdt_id = :id", "id={$PdtId}");
+if ($PdtId) {
+    $Read->exeRead(DB_PDT, "WHERE pdt_id = :id", "id={$PdtId}");
+}
+
+if (!$PdtId || !$Read->getResult()) {
+    $_SESSION['trigger_controll'] = "<b>OPPSS {$Admin['user_name']}</b>, você tentou criar a variação de um produto que não existe ou que foi removido recentemente!";
+    header('Location: dashboard.php?wc=products/home');
+    exit;
+}
 
 $ProductReply = $Read->getResult()[0];
 
@@ -46,7 +54,7 @@ $Create->exeCreate(DB_PDT, $ProductReply);
 $PDTCRTUPDATE =
     [
         'pdt_name' => Check::name($ProductReply['pdt_title']) . "-{$Create->getResult()}",
-        'pdt_code' => str_pad($Create->getResult(), 4, 0, STR_PAD_LEFT)
+        'pdt_code' => str_pad((string)$Create->getResult(), 4, '0', STR_PAD_LEFT)
     ];
 $Update->exeUpdate(DB_PDT, $PDTCRTUPDATE, "WHERE pdt_id = :id", "id={$Create->getResult()}");
 

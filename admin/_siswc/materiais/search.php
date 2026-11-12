@@ -13,6 +13,7 @@ $Search = filter_input_array(INPUT_POST);
 if ($Search && $Search['s']) {
     $S = Check::safeUrlEncode($Search['s']);
     header('Location: dashboard.php?wc=materiais/search&s=' . $S);
+    exit;
 }
 
 $GetSearch = filter_input(INPUT_GET, 's', FILTER_DEFAULT);

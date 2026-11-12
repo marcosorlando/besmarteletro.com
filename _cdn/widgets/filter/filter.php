@@ -8,43 +8,31 @@
         unset($_SESSION['filter']);
     }
 
-    /* department */
-    if (
-        !empty($_SESSION['filter']['add']['pdt_department']) && strpos(
-            $_SESSION['filter']['add']['pdt_department'],
-            ','
-        )
-    ) {
-        $arrDepartment = explode(',', $_SESSION['filter']['add']['pdt_department']);
-        $findDepartment = null;
+    /* department | ids marcados no filtro (sempre inteiros, nunca texto livre no SQL) */
+    $filterDepartments = array_values(array_unique(array_filter(array_map(
+        'intval',
+        explode(',', (string)($_SESSION['filter']['add']['pdt_department'] ?? ''))
+    ))));
 
-        foreach ($arrDepartment as $CAT) {
-            if ($findDepartment) {
-                $findDepartment .= " OR FIND_IN_SET('{$CAT}', p.pdt_subcategory)";
-            } else {
-                $findDepartment = "FIND_IN_SET('{$CAT}', p.pdt_subcategory)";
-            }
-        }
+    // Cada categoria marcada casa com a subcategoria ou com o setor do produto; entre elas vale OU
+    $findDepartment = implode(' OR ', array_map(
+        static fn(int $cat): string => "FIND_IN_SET('{$cat}', p.pdt_subcategory) OR FIND_IN_SET('{$cat}', p.pdt_category)",
+        $filterDepartments
+    ));
+
+    $condDepartment = '';
+    if ('produtos' === $URL[0]) {
+        // Sempre dentro da categoria da página; com filtro, apenas as categorias marcadas
+        $condDepartment = ' AND (FIND_IN_SET(:category, p.pdt_category) OR FIND_IN_SET(:category, p.pdt_subcategory))'
+            . ($findDepartment ? " AND ({$findDepartment})" : '');
+    } elseif ('pesquisa' === $URL[0] && $findDepartment) {
+        $condDepartment = " AND ({$findDepartment})";
     }
-
-    $condDepartment = ($URL[0] == 'produtos' && !empty($_SESSION['filter']['add']['pdt_department']) && strpos(
-        $_SESSION['filter']['add']['pdt_department'],
-        ','
-    ) ? " AND (FIND_IN_SET(:category, p.pdt_category) OR ({$findDepartment}))" : ($URL[0] == 'produtos' && !empty($_SESSION['filter']['add']['pdt_department']) && !strpos(
-        $_SESSION['filter']['add']['pdt_department'],
-        ','
-    ) ? " AND FIND_IN_SET(:category, p.pdt_category) AND FIND_IN_SET('{$_SESSION['filter']['add']['pdt_department']}', p.pdt_subcategory)" : ($URL[0] == 'produtos' && empty($_SESSION['filter']['add']['pdt_department']) ? ' AND (FIND_IN_SET(:category, p.pdt_category) OR FIND_IN_SET(:category, p.pdt_subcategory))' : ($URL[0] == 'pesquisa' && !empty($_SESSION['filter']['add']['pdt_department']) && strpos(
-        $_SESSION['filter']['add']['pdt_department'],
-        ','
-    ) ? " AND ({$findDepartment})" : (($URL[0] == 'pesquisa') && !empty($_SESSION['filter']['add']['pdt_department']) && !strpos(
-        $_SESSION['filter']['add']['pdt_department'],
-        ','
-    ) ? " AND FIND_IN_SET('{$_SESSION['filter']['add']['pdt_department']}', p.pdt_subcategory)" : '')))));
-    $parseDepartment = ($URL[0] == 'produtos' ? "&category={$cat_id}" : '');
+    $parseDepartment = ('produtos' === $URL[0] ? '&category=' . (int)($cat_id ?? 0) : '');
 
     /* search */
-    $condSearch = ($URL[0] == 'pesquisa' && !empty($URL[1]) ? " AND p.pdt_title LIKE '%' :search '%'" : '');
-    $parseSearch = ($URL[0] == 'pesquisa' && !empty($URL[1]) ? '&search=' . urldecode($URL[1]) . '' : '');
+    $condSearch = ('pesquisa' === $URL[0] && !empty($URL[1]) ? " AND p.pdt_title LIKE '%' :search '%'" : '');
+    $parseSearch = ('pesquisa' === $URL[0] && !empty($URL[1]) ? '&' . http_build_query(['search' => urldecode((string)$URL[1])]) : '');
 ?>
 
 <div class="workcontrol_filter<?= (!empty($_SESSION['filter']['access']) ? ' active' : ''); ?>">
@@ -57,7 +45,7 @@
             $Read ??= new Read();
             /* department */
             $Read->fullRead(
-                "SELECT c.cat_id, c.cat_title, (SELECT COUNT(DISTINCT (p.pdt_id)) FROM " . DB_PDT . " p WHERE p.pdt_status = :status AND FIND_IN_SET(c.cat_id, p.pdt_subcategory){$condSearch}) AS total_pdt FROM " . DB_PDT_CATS . " c" . ($URL[0] == 'produtos' ? " WHERE c.cat_parent = :category" : '') . "",
+                "SELECT c.cat_id, c.cat_title, (SELECT COUNT(DISTINCT (p.pdt_id)) FROM " . DB_PDT . " p WHERE p.pdt_status = :status AND (FIND_IN_SET(c.cat_id, p.pdt_subcategory) OR FIND_IN_SET(c.cat_id, p.pdt_category))" . ($URL[0] == 'produtos' ? ' AND (FIND_IN_SET(:category, p.pdt_category) OR FIND_IN_SET(:category, p.pdt_subcategory))' : '') . "{$condSearch}) AS total_pdt FROM " . DB_PDT_CATS . " c" . ($URL[0] == 'produtos' ? " WHERE c.cat_parent = :category" : '') . "",
                 "status=1{$parseSearch}" . ($URL[0] == 'produtos' ? "&category={$cat_id}" : '') . ""
             );
             if ($Read->getResult()) {
@@ -77,37 +65,27 @@
                             <?php
                                 foreach ($Read->getResult() as $Department) {
                                     if ($Department['total_pdt'] >= 1) {
-                                        $active = (!empty($_SESSION['filter']['add']['pdt_department']) && strpos(
-                                            $_SESSION['filter']['add']['pdt_department'],
-                                            ','
-                                        ) && in_array(
-                                            $Department['cat_id'],
-                                            explode(',', $_SESSION['filter']['add']['pdt_department'])
-                                        ) ? ' class="active"' : (!empty($_SESSION['filter']['add']['pdt_department']) && !strpos(
-                                            $_SESSION['filter']['add']['pdt_department'],
-                                            ','
-                                        ) && $Department['cat_id'] == $_SESSION['filter']['add']['pdt_department'] ? ' class="active"' : ''));
-                                        $checked = (!empty($_SESSION['filter']['add']['pdt_department']) && strpos(
-                                            $_SESSION['filter']['add']['pdt_department'],
-                                            ','
-                                        ) && in_array(
-                                            $Department['cat_id'],
-                                            explode(',', $_SESSION['filter']['add']['pdt_department'])
-                                        ) ? ' checked="checked"' : (!empty($_SESSION['filter']['add']['pdt_department']) && !strpos(
-                                            $_SESSION['filter']['add']['pdt_department'],
-                                            ','
-                                        ) && $Department['cat_id'] == $_SESSION['filter']['add']['pdt_department'] ? ' checked="checked"' : ''));
+                                        $isChecked = in_array((int)$Department['cat_id'], $filterDepartments, true);
+                                        $active = ($isChecked ? ' class="active"' : '');
+                                        $checked = ($isChecked ? ' checked="checked"' : '');
                                         ?>
-										<label class="j_filter_check" title="<?= $Department['cat_title']; ?>">
+										<label class="j_filter_check<?= ($isChecked ? ' active' : ''); ?>" title="<?= $Department['cat_title']; ?>">
 											<input type="checkbox" name="pdt_department[]"
 											       value="<?= $Department['cat_id']; ?>"<?= $checked; ?>/>
-											<span<?= $active; ?>><?= $Department['cat_title']; ?></span>
+											<span<?= $active; ?>><?= $Department['cat_title']; ?> <small>(<?= $Department['total_pdt']; ?>)</small></span>
 										</label>
                                         <?php
                                     }
                                 }
                             ?>
 						</div>
+                        <?php
+                            if ($filterDepartments) { ?>
+								<button type="button" class="workcontrol_filter_clear j_filter_clear">
+									<i class="fa fa-times"></i> Limpar filtros
+								</button>
+                                <?php
+                            } ?>
 					</div>
                     <?php
                 }

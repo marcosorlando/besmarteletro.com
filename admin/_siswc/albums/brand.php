@@ -33,6 +33,7 @@ if ($BrandId) {
             E_USER_NOTICE
         );
         \header('Location: dashboard.php?wc=products/brands');
+        exit;
     }
 } else {
     $Date = \date('Y-m-d H:i:s');
@@ -41,6 +42,7 @@ if ($BrandId) {
     $CarCreate = ['brand_name' => $Name, 'brand_created' => $Date];
     $Create->exeCreate(DB_PDT_BRANDS, $CarCreate);
     \header('Location: dashboard.php?wc=products/brand&id='.$Create->getResult());
+    exit;
 }
 ?>
 

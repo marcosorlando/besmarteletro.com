@@ -28,6 +28,7 @@
             ];
             $Create->exeCreate(DB_ABOUTPAGE, $aboutCreate);
            header('Location: dashboard.php?wc=aboutpage/create&id=' . $Create->getResult());
+           exit;
         endif;
     endif;
 ?>

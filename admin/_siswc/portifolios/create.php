@@ -22,6 +22,7 @@ if ($PostId) :
     else :
         $_SESSION['trigger_controll'] = "<b>OPPSS {$Admin['user_name']}</b>, você tentou editar um projeto que não existe ou que foi removido recentemente!";
         header('Location: dashboard.php?wc=portifolios/home');
+        exit;
     endif;
 else :
     $PostCreate = [
@@ -32,6 +33,7 @@ else :
     ];
     $Create->exeCreate(DB_PORTIFOLIO, $PostCreate);
     header('Location: dashboard.php?wc=portifolios/create&id=' . $Create->getResult());
+    exit;
 endif;
 ?>
 

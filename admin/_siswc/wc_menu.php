@@ -43,9 +43,9 @@
 				<li class="dashboard_nav_menu_sub_li <?php
                     echo strstr(
                         (string)$getViewInput,
-                        'products/format'
+                        'products/line'
                     ) ? 'dashboard_nav_menu_active' : ''; ?>">
-					<a title="Processos de Produtos" href="dashboard.php?wc=products/formats">&raquo; Formatos</a>
+					<a title="Linhas de Produtos" href="dashboard.php?wc=products/lines">&raquo; Linhas</a>
 				</li>
 
 				<li class="dashboard_nav_menu_sub_li <?php

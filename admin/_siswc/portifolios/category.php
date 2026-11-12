@@ -1,6 +1,8 @@
 <?php
 use App\Conn\Read;
 use App\Helpers\Check;
+use App\Conn\Create;
+use App\Conn\Delete;
 
 $AdminLevel = LEVEL_WC_POSTS;
 if (!APP_POSTS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel):
@@ -44,7 +46,7 @@ if ($CatId):
         );
         extract($FormData);
     else:
-        $_SESSION['trigger_controll'] = Erro("<b>OPPSS {$Admin['user_name']}</b>, você tentou editar uma categoria que não existe ou que foi removida recentemente!", E_USER_NOTICE);
+        $_SESSION['trigger_controll'] = Check::erro("<b>OPPSS {$Admin['user_name']}</b>, você tentou editar uma categoria que não existe ou que foi removida recentemente!", E_USER_NOTICE);
         header('Location: dashboard.php?wc=portifolios/categories');
         exit;
     endif;

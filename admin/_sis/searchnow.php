@@ -89,7 +89,7 @@ if (!$Read->getResult()) {
               <h1 class='icon-search'><a href='dashboard.php?wc=posts/search&s=".urlencode(
             (string) $search_key
         )."' title='Ver resultados'>".('month' == $search_parse
-            ? '<b>Mês: </b>'.getWcMonths($search_key) : $search_key).'</a></h1>
+            ? '<b>Mês: </b>'.Check::getWcMonths((int) $search_key) : $search_key).'</a></h1>
                            <p>DIA '.date('d/m/Y H\hi', strtotime((string) $search_date)).'</p>
                            <p>'.str_pad((string) $search_count, 4, 0, STR_PAD_LEFT).' VEZES</p>
                            <p>'.str_pad((string) $Read->getRowCount(), 4, 0, STR_PAD_LEFT)." RESULTADOS</p>

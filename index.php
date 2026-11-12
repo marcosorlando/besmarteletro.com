@@ -15,7 +15,6 @@
 
     use App\Conn\Read;
     use App\Conn\Update;
-    use App\Helpers\Check;
     use App\Models\Seo;
     use App\Models\Session;
 
@@ -59,7 +58,11 @@
     $canonicalPath = BASE . '/' . implode('/', array_map('urlencode', explode('/', $getURL)));
     $canonicalQuery = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_QUERY);
     $canonicalURL = $canonicalPath
-        . ('pesquisa-blog' === $URL[0] && in_array($canonicalQuery, ['author', 'month'], true) ? "?{$canonicalQuery}" : '');
+        . ('pesquisa-blog' === $URL[0] && in_array(
+            $canonicalQuery,
+            ['author', 'month'],
+            true
+        ) ? "?{$canonicalQuery}" : '');
     $canonicalPath = htmlspecialchars($canonicalPath, ENT_QUOTES, 'UTF-8');
     $canonicalURL = htmlspecialchars($canonicalURL, ENT_QUOTES, 'UTF-8');
 
@@ -172,11 +175,7 @@
 			<meta property="twitter:image" content="<?= $SEO->getImage(); ?>"/>
 			<meta property="twitter:url" content="<?= $canonicalURL; ?>"/>
 
-			<link rel='preconnect' href='https://fonts.googleapis.com'>
-			<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-			<link href='https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap'
-			      rel='stylesheet'>
-			<!-- Fonte principal do Site-->
+			<!-- Fonte principal do Site (SITE_FONT_NAME vem no formato da URL do Google Fonts: Barlow+Semi+Condensed) -->
 			<link rel='preconnect' href='https://fonts.googleapis.com'>
 			<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
 			<link href='https://fonts.googleapis.com/css2?family=<?= SITE_FONT_NAME; ?>:wght@<?= SITE_FONT_WEIGHT; ?>&display=swap'
@@ -187,7 +186,7 @@
                 require REQUIRE_PATH . '/presets.php';
             ?>
 			<style> * {
-                    font-family: '<?= SITE_FONT_NAME; ?>', sans-serif;
+                    font-family: '<?= str_replace('+', ' ', SITE_FONT_NAME); ?>', sans-serif;
                 }</style>
 
 			<!-- favicon -->
@@ -206,10 +205,10 @@
 			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/owl.carousel.min.css"/>
 			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/owl.theme.default.min.css"/>
 			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/jquery-ui.min.css"/>
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/widgets/filter/filter.min.css"/>
+			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/widgets/filter/filter.css"/>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"/>
 
-			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/style.min.css'/>
+			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/style.css'/>
 			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/_css/responsive.min.css'/>
 
 			<script src="<?= BASE; ?>/_cdn/jquery.js"></script>
@@ -434,7 +433,11 @@
                     } else {
                         trigger_error(
                             'Não foi possível incluir o arquivo themes/'
-                            . THEME . '/' . htmlspecialchars($getURL, ENT_QUOTES, 'UTF-8') . '.php <b>(O arquivo 404 também não existe!)</b>'
+                            . THEME . '/' . htmlspecialchars(
+                                $getURL,
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) . '.php <b>(O arquivo 404 também não existe!)</b>'
                         );
                     }
                     echo '</main>';
@@ -490,7 +493,11 @@
                     } else {
                         trigger_error(
                             'Não foi possível incluir o arquivo themes/'
-                            . THEME . '/' . htmlspecialchars($getURL, ENT_QUOTES, 'UTF-8') . '.php <b>(O arquivo 404 também não existe!)</b>'
+                            . THEME . '/' . htmlspecialchars(
+                                $getURL,
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) . '.php <b>(O arquivo 404 também não existe!)</b>'
                         );
                     }
                     echo '</main>';
@@ -553,16 +560,20 @@
 		<script src='<?= BASE; ?>/_cdn/widgets/filter/filter.min.js'></script>
 
         <?php
-            // WC THEME JS FILES
+            // WC THEME JS FILES | cada script uma única vez: usa o .min.js quando existir, senão o .js
             if (file_exists('themes/' . THEME . '/_js')) {
+                $wcJsThemeLoad = [];
                 foreach (scandir('themes/' . THEME . '/_js') as $wcJsThemeFiles) {
-                    if (
-                        file_exists('themes/' . THEME . "/_js/{$wcJsThemeFiles}") && !is_dir(
-                            'themes/' . THEME . "/_js/{$wcJsThemeFiles}"
-                        ) && pathinfo('themes/' . THEME . "/_js/{$wcJsThemeFiles}")['extension'] == 'js'
-                    ) {
-                        echo '<script src="' . $_SESSION['INCLUDE_PATH'] . '/_js/' . $wcJsThemeFiles . '"></script>' . "\r\n";
+                    $wcJsThemePath = 'themes/' . THEME . "/_js/{$wcJsThemeFiles}";
+                    if (is_file($wcJsThemePath) && 'js' === pathinfo($wcJsThemePath, PATHINFO_EXTENSION)) {
+                        $wcJsThemeBase = preg_replace('/(\.min)?\.js$/', '', $wcJsThemeFiles);
+                        if (!isset($wcJsThemeLoad[$wcJsThemeBase]) || str_ends_with($wcJsThemeFiles, '.min.js')) {
+                            $wcJsThemeLoad[$wcJsThemeBase] = $wcJsThemeFiles;
+                        }
                     }
+                }
+                foreach ($wcJsThemeLoad as $wcJsThemeFiles) {
+                    echo '<script src="' . $_SESSION['INCLUDE_PATH'] . '/_js/' . $wcJsThemeFiles . '"></script>' . "\r\n";
                 }
             }
             // MAIN SCRIPT THEME

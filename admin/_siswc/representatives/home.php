@@ -26,6 +26,7 @@ $Search = filter_input_array(INPUT_POST);
 if ($Search && (isset($Search['s']))) {
     $S = (isset($Search['s']) ? Check::safeUrlEncode($Search['s']) : '');
     header(sprintf('Location: dashboard.php?wc=representatives/home&s=%s', $S));
+    exit;
 }
 ?>
 

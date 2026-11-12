@@ -27,6 +27,7 @@ if ($MatId) {
             $Admin['user_name']
         );
         header('Location: dashboard.php?wc=materiais/home');
+        exit;
     }
 } else {
     $PostCreate = [
@@ -37,6 +38,7 @@ if ($MatId) {
     ];
     $Create->exeCreate(DB_MATERIAIS, $PostCreate);
     header('Location: dashboard.php?wc=materiais/create&id=' . $Create->getResult());
+    exit;
 }
 ?>
 

@@ -73,12 +73,12 @@ use App\Models\Upload;
 					if (!empty($_FILES['pdt_drawing'])) {
 						$File = $_FILES['pdt_drawing'];
 
-						if ($Product['pdt_drawing'] && file_exists("../../uploads/{$Product['pdt_drawing']}") && !is_dir("../../uploads/{$Product['pdt_drawing']}")) {
-							unlink("../../uploads/{$Product['pdt_drawing']}");
-						}
-
-						$Upload->file($File, "{$PostData['pdt_name']}-{$PdtId}", 'pdf', "5");
+						$Upload->file($File, "{$PostData['pdt_name']}-{$PdtId}", 'pdf', 5);
 						if ($Upload->getResult()) {
+							// Remove o PDF antigo só depois que o novo foi enviado
+							if ($Product['pdt_drawing'] && file_exists("../../uploads/{$Product['pdt_drawing']}") && !is_dir("../../uploads/{$Product['pdt_drawing']}")) {
+								unlink("../../uploads/{$Product['pdt_drawing']}");
+							}
 							$PostData['pdt_drawing'] = $Upload->getResult();
 						} else {
 							$jSON['trigger'] = Check::ajaxErro("<b class='icon-file-pdf'>ERRO AO ENVIAR A DESENHO TÉCNICO:</b> Olá {$_SESSION['userLogin']['user_name']}, selecione um arquivo em PDF para enviar!",
@@ -91,11 +91,12 @@ use App\Models\Upload;
 					if (!empty($_FILES['pdt_cover'])) {
 						$File = $_FILES['pdt_cover'];
 
-						if ($Product['pdt_cover'] && file_exists("../../uploads/{$Product['pdt_cover']}") && !is_dir("../../uploads/{$Product['pdt_cover']}")) {							unlink("../../uploads/{$Product['pdt_cover']}");
-						}
-
 						$Upload->image($File, "{$PdtId}-{$PostData['pdt_name']}-" . time(), 1000);
 						if ($Upload->getResult()) {
+							// Remove a capa antiga só depois que a nova foi enviada
+							if ($Product['pdt_cover'] && file_exists("../../uploads/{$Product['pdt_cover']}") && !is_dir("../../uploads/{$Product['pdt_cover']}")) {
+								unlink("../../uploads/{$Product['pdt_cover']}");
+							}
 							$PostData['pdt_cover'] = $Upload->getResult();
 						} else {
 							$jSON['trigger'] = Check::ajaxErro("<b class='icon-image'>ERRO AO ENVIAR CAPA:</b> Olá {$_SESSION['userLogin']['user_name']}, selecione uma imagem JPG de 1000x1000px para a capa!",
@@ -107,8 +108,8 @@ use App\Models\Upload;
 
 					if (!empty($_FILES['image'])) {
 						$File = $_FILES['image'];
-						$gbFile = [];
-						$gbCount = count($File['type']);
+						$gbFiles = [];
+						$gbCount = count((array)$File['type']);
 						$gbKeys = array_keys($File);
 						$gbLoop = 0;
 
@@ -137,14 +138,17 @@ use App\Models\Upload;
 					if (isset($PostData['pdt_subcategory'])) {
 						$PostData['pdt_category'] = [];
 
+						$PostData['pdt_subcategory'] = array_values(array_unique(array_filter(array_map('intval', (array)$PostData['pdt_subcategory']))));
 						foreach ($PostData['pdt_subcategory'] as $CAT) {
 							$Read->fullRead("SELECT cat_parent FROM " . DB_PDT_CATS . " WHERE cat_id = :id",
 								"id={$CAT}");
-							$PostData['pdt_category'][] = $Read->getResult()[0]['cat_parent'];
+							if ($Read->getResult() && !empty($Read->getResult()[0]['cat_parent'])) {
+								$PostData['pdt_category'][] = $Read->getResult()[0]['cat_parent'];
+							}
 						}
 
-						$PostData['pdt_subcategory'] = implode(',', array_unique($PostData['pdt_subcategory']));
-						$PostData['pdt_category'] = implode(',', array_unique($PostData['pdt_category']));
+						$PostData['pdt_subcategory'] = ($PostData['pdt_subcategory'] ? implode(',', $PostData['pdt_subcategory']) : null);
+						$PostData['pdt_category'] = ($PostData['pdt_category'] ? implode(',', array_unique($PostData['pdt_category'])) : null);
 					} else {
 						$PostData['pdt_subcategory'] = null;
 						$PostData['pdt_category'] = null;
@@ -165,7 +169,7 @@ use App\Models\Upload;
 						$jSON['trigger'] = Check::ajaxErro("<span class='icon-warning'><b>OPPSSS:</b> Já existe um produto cadastrado com o código {$PostData['pdt_code']}, favor altere o código deste produto!</span>",
 							E_USER_WARNING);
 
-						$PostData['pdt_code'] = str_pad($PdtId, 7, 0, STR_PAD_LEFT);
+						$PostData['pdt_code'] = str_pad((string)$PdtId, 7, '0', STR_PAD_LEFT);
 						$PostData['pdt_status'] = '0';
 					}
 
@@ -302,18 +306,23 @@ use App\Models\Upload;
 					$PostData['cat_tree'] = null;
 				}
 
-				$Read->fullRead("SELECT cat_parent FROM " . DB_PDT_CATS . " WHERE cat_id = :id AND cat_parent != :parent",
-					"id={$CatId}&parent={$PostData['cat_parent']}");
-				if ($Read->getResult()) {
-					//Contriuição do André Dorneles #1856
-
-					$PdtUpdate['pdt_category'] = $PostData['cat_parent'];
-					$Update->exeUpdate(DB_PDT, $PdtUpdate,
-						"WHERE pdt_category != :catpai AND pdt_subcategory = :catfilha",
-						"catpai={$PostData['cat_parent']}&catfilha={$CatId}");
-				}
+				$Read->fullRead("SELECT cat_parent FROM " . DB_PDT_CATS . " WHERE cat_id = :id", "id={$CatId}");
+				$ParentChanged = ($Read->getResult() && (string)$Read->getResult()[0]['cat_parent'] !== (string)$PostData['cat_parent']);
 
 				$Update->exeUpdate(DB_PDT_CATS, $PostData, "WHERE cat_id = :id", "id={$CatId}");
+
+				// Mudou o setor: recalcula pdt_category (setores) dos produtos que usam esta categoria
+				if ($ParentChanged) {
+					$Read->fullRead("SELECT pdt_id, pdt_subcategory FROM " . DB_PDT . " WHERE FIND_IN_SET(:cat, pdt_subcategory)",
+						"cat={$CatId}");
+					foreach (($Read->getResult() ?: []) as $PdtCat) {
+						$Read->fullRead("SELECT DISTINCT cat_parent FROM " . DB_PDT_CATS . " WHERE FIND_IN_SET(cat_id, :subs) AND cat_parent IS NOT NULL",
+							"subs={$PdtCat['pdt_subcategory']}");
+						$PdtParents = array_column($Read->getResult() ?: [], 'cat_parent');
+						$Update->exeUpdate(DB_PDT, ['pdt_category' => ($PdtParents ? implode(',', $PdtParents) : null)],
+							"WHERE pdt_id = :id", "id={$PdtCat['pdt_id']}");
+					}
+				}
 				$Read->fullRead("SELECT cat_id, cat_parent FROM " . DB_PDT_CATS . " WHERE cat_parent = :parent",
 					"parent={$CatId}");
 
@@ -361,7 +370,7 @@ use App\Models\Upload;
 
 			case 'cat_delete':
 				$CatId = $PostData['del_id'];
-				$Read->fullRead("SELECT pdt_id FROM " . DB_PDT . " WHERE pdt_category = :cat OR pdt_subcategory = :cat",
+				$Read->fullRead("SELECT pdt_id FROM " . DB_PDT . " WHERE FIND_IN_SET(:cat, pdt_category) OR FIND_IN_SET(:cat, pdt_subcategory)",
 					"cat={$CatId}");
 				if ($Read->getResult()) {
 					$jSON['trigger'] = Check::ajaxErro("<b class='icon-info'>OPSS: </b>Desculpe {$_SESSION['userLogin']['user_name']}, mas não é possível remover categorias com produtos cadastrados nela!",
@@ -396,11 +405,12 @@ use App\Models\Upload;
 					if (!empty($_FILES['line_image'])) {
 						$File = $_FILES['line_image'];
 
-						if ($Line['line_image'] && file_exists("../../uploads/linhas/{$Line['line_image']}") && !is_dir("../../uploads/linhas/{$Line['line_image']}")) {							unlink("../../uploads/linhas/{$Line['line_image']}");
-						}
-
 						$Upload->image($File, "{$LineId}-{$PostData['line_name']}-" . time(), 400, "linhas");
 						if ($Upload->getResult()) {
+							// Remove a imagem antiga só depois que a nova foi enviada
+							if ($Line['line_image'] && file_exists("../../uploads/{$Line['line_image']}") && !is_dir("../../uploads/{$Line['line_image']}")) {
+								unlink("../../uploads/{$Line['line_image']}");
+							}
 							$PostData['line_image'] = $Upload->getResult();
 						} else {
 							$jSON['trigger'] = Check::ajaxErro("<b class='icon-image'>ERRO AO ENVIAR:</b> Olá {$_SESSION['userLogin']['user_name']}, selecione uma imagem JPG ou PNG para a linha.",

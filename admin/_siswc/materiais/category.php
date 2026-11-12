@@ -30,6 +30,7 @@ if ($CatId) {
             E_USER_NOTICE
         );
         header('Location: dashboard.php?wc=materiais/categories');
+        exit;
     }
 } else {
     $Date = date('Y-m-d H:i:s');
@@ -38,6 +39,7 @@ if ($CatId) {
     $CatCreate = ['category_name' => $Name, 'category_date' => $Date];
     $Create->exeCreate(DB_MATCATEGORIES, $CatCreate);
     header('Location: dashboard.php?wc=materiais/category&id=' . $Create->getResult());
+    exit;
 }
 ?>
 

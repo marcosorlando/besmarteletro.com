@@ -18,6 +18,7 @@ Thumbs.db
 *.swp
 *.swo
 error_log
+commit-msg.txt
 
 # Arquivos de ambiente e segurança
 .env

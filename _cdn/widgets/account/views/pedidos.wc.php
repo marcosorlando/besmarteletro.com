@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Check;
+use App\Models\Pager;
 
 if (empty($_SESSION['userLogin']) || !APP_PRODUCTS_TRAVI) {
     exit('<h1 style="padding: 50px 0; text-align: center; font-size: 3em; font-weight: 300; color: #C63D3A">Acesso Negado!</h1>');

@@ -30,17 +30,20 @@ if ($AlbId) {
             $Admin['user_name']
         );
         \header('Location: dashboard.php?wc=albums/home');
+        exit;
     }
 } else {
     $AlbCreate = ['album_created' => \date('Y-m-d H:i:s'), 'album_status' => 0];
     $Create->exeCreate(DB_ALBUMS, $AlbCreate);
     \header('Location: dashboard.php?wc=albums/create&id='.$Create->getResult());
+    exit;
 }
 
 $Search = \filter_input_array(INPUT_POST);
 if ($Search && $Search['s']) {
     $S = \urlencode((string) $Search['s']);
     \header('Location: dashboard.php?wc=albums/search&s='.$S);
+    exit;
 }
 ?>
 

@@ -41,3 +41,4 @@ $PDTCRTUPDATE = [
 $Update->exeUpdate(DB_PDT, $PDTCRTUPDATE, 'WHERE pdt_id = :id', 'id='.$Create->getResult());
 
 \header('Location: dashboard.php?wc=products/create&id='.$Create->getResult());
+exit;

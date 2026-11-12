@@ -5,8 +5,7 @@ use App\Conn\Delete;
 use App\Conn\Read;
 use App\Conn\Update;
 use App\Helpers\Check;
-
-// Upload is a global helper class (non-namespaced)
+use App\Models\Upload;
 
 \session_start();
 

@@ -691,6 +691,25 @@ class Check
     }
 
     /**
+     * Voltagens do produto (coluna pdt_voltage). O tema exibe o selo de 127V e 220V.
+     */
+    public static function getWcVoltage(?int $voltage = null): mixed
+    {
+
+        $voltages = [
+            0 => 'Não se aplica',
+            127 => '127V',
+            220 => '220V'
+        ];
+
+        if (is_int($voltage) && array_key_exists($voltage, $voltages) === true) {
+            return $voltages[$voltage];
+        } else {
+            return $voltages;
+        }
+    }
+
+    /**
      * Converte comprimento de milímetros para polegadas.
      *
      * @param null|float|int $length comprimento em milímetros

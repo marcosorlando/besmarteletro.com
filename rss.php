@@ -13,20 +13,133 @@ $Feed = \strip_tags(\trim((string) $getFeed));
 
 echo '<?xml version="1.0" encoding="UTF-8" ?>'."\r\n";
 
+// Escapa texto para XML
+$xml = static fn (mixed $value): string => \htmlspecialchars((string) $value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+
 if ('instant-articles' == $Feed) {
     echo '<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">'."\r\n";
+} elseif ('products' == $Feed) {
+    // Namespace g: (Google Merchant / catálogo Meta)
+    echo '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">'."\r\n";
 } else {
     echo '<rss version="2.0">'."\r\n";
 }
 
 echo '<channel>'."\r\n";
 
-echo '<title>'.SITE_NAME.' - '.SITE_SUBNAME.'</title>'."\r\n";
-echo '<link>'.BASE.'</link>'."\r\n";
-echo '<description>'.SITE_DESC.'</description>'."\r\n";
+echo '<title>'.$xml(SITE_NAME.' - '.SITE_SUBNAME).'</title>'."\r\n";
+echo '<link>'.BASE.('products' == $Feed ? '/produtos/produtos' : '').'</link>'."\r\n";
+echo '<description>'.$xml(SITE_DESC).'</description>'."\r\n";
 echo '<language>pt-br</language>'."\r\n";
 
 switch ($Feed) {
+    case 'products':
+        if (!\defined('APP_PDT') || !APP_PDT) {
+            break;
+        }
+
+        // Categorias: id => [título, árvore] para montar o product_type (Produtos > Eletrodomésticos > Linha Smart Home)
+        $PdtCats = [];
+        $Read->fullRead('SELECT cat_id, cat_title, cat_tree FROM '.DB_PDT_CATS);
+        foreach ($Read->getResult() ?: [] as $Cat) {
+            $PdtCats[(int) $Cat['cat_id']] = $Cat;
+        }
+
+        $PdtCatPath = static function (int $catId) use ($PdtCats): string {
+            if (!isset($PdtCats[$catId])) {
+                return '';
+            }
+
+            $Ids = \array_filter(\array_map('intval', \explode(',', (string) $PdtCats[$catId]['cat_tree'])));
+            $Ids[] = $catId;
+            $Titles = [];
+            foreach (\array_unique($Ids) as $Id) {
+                if (isset($PdtCats[$Id])) {
+                    $Titles[] = $PdtCats[$Id]['cat_title'];
+                }
+            }
+
+            return \implode(' > ', $Titles);
+        };
+
+        // Galeria: product_id => [imagens]
+        $PdtGallery = [];
+        $Read->fullRead('SELECT product_id, image FROM '.DB_PDT_GALLERY.' ORDER BY id ASC');
+        foreach ($Read->getResult() ?: [] as $Image) {
+            $PdtGallery[(int) $Image['product_id']][] = $Image['image'];
+        }
+
+        // Mesma regra da página do produto: ativo e com linha cadastrada
+        $Read->fullRead(
+            'SELECT p.pdt_id, p.pdt_code, p.pdt_title, p.pdt_subtitle, p.pdt_name, p.pdt_cover, p.pdt_content, '
+            .'p.pdt_created, p.pdt_price, p.pdt_offer_price, p.pdt_offer_start, p.pdt_offer_end, p.pdt_category, '
+            .'p.pdt_subcategory, p.pdt_model, l.line_title, b.brand_title '
+            .'FROM '.DB_PDT.' p '
+            .'INNER JOIN '.DB_PDT_LINES.' l ON l.line_id = p.pdt_line '
+            .'LEFT JOIN '.DB_PDT_BRANDS.' b ON b.brand_id = p.pdt_brand '
+            .'WHERE p.pdt_status = :status ORDER BY p.pdt_created DESC',
+            'status=1'
+        );
+
+        foreach ($Read->getResult() ?: [] as $Pdt) {
+            $PdtLink = BASE.'/produto/'.$Pdt['pdt_name'];
+            $PdtImage = BASE.'/uploads/'.$Pdt['pdt_cover'];
+            $PdtId = '' !== \trim((string) $Pdt['pdt_code']) ? \trim((string) $Pdt['pdt_code']) : 'product_'.$Pdt['pdt_id'];
+
+            // Descrição em texto puro (ficha técnica); sem conteúdo, usa o subtítulo
+            $PdtDesc = \trim((string) \preg_replace('/\s+/u', ' ', \html_entity_decode(\strip_tags(\str_replace(['</p>', '<br>', '<br/>', '<br />'], ' ', (string) $Pdt['pdt_content'])), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+            $PdtDesc = '' !== $PdtDesc ? \mb_substr($PdtDesc, 0, 5000) : (string) ($Pdt['pdt_subtitle'] ?: $Pdt['pdt_title']);
+
+            // product_type pela 1ª subcategoria (caminho completo); sem subcategoria, pela 1ª categoria
+            $PdtSub = (int) \strtok((string) $Pdt['pdt_subcategory'], ',');
+            $PdtType = $PdtCatPath($PdtSub) ?: $PdtCatPath((int) \strtok((string) $Pdt['pdt_category'], ','));
+
+            echo '<item>'."\r\n";
+            echo '<title>'.$xml($Pdt['pdt_title']).'</title>'."\r\n";
+            echo '<link>'.$xml($PdtLink).'</link>'."\r\n";
+            echo '<guid isPermaLink="true">'.$xml($PdtLink).'</guid>'."\r\n";
+            echo '<pubDate>'.\date(DATE_RSS, \strtotime((string) $Pdt['pdt_created']) ?: \time()).'</pubDate>'."\r\n";
+            echo '<description>'.$xml($PdtDesc).'</description>'."\r\n";
+            if ('' !== $PdtType) {
+                echo '<category>'.$xml($PdtType).'</category>'."\r\n";
+            }
+            echo '<enclosure type="image/'.\strtolower(\pathinfo((string) $Pdt['pdt_cover'], PATHINFO_EXTENSION) ?: 'jpeg').'" url="'.$xml($PdtImage).'" length="0"/>'."\r\n";
+
+            // Catálogo (Google Merchant / Meta)
+            echo '<g:id>'.$xml($PdtId).'</g:id>'."\r\n";
+            echo '<g:title>'.$xml($Pdt['pdt_title']).'</g:title>'."\r\n";
+            echo '<g:description>'.$xml($PdtDesc).'</g:description>'."\r\n";
+            echo '<g:link>'.$xml($PdtLink).'</g:link>'."\r\n";
+            echo '<g:image_link>'.$xml($PdtImage).'</g:image_link>'."\r\n";
+            foreach (\array_slice($PdtGallery[(int) $Pdt['pdt_id']] ?? [], 0, 10) as $Image) {
+                echo '<g:additional_image_link>'.$xml(BASE.'/uploads/'.$Image).'</g:additional_image_link>'."\r\n";
+            }
+            echo '<g:brand>'.$xml($Pdt['brand_title'] ?: SITE_NAME).'</g:brand>'."\r\n";
+            echo '<g:condition>new</g:condition>'."\r\n";
+            echo '<g:availability>in stock</g:availability>'."\r\n";
+            echo '<g:mpn>'.$xml($Pdt['pdt_model'] ?: $PdtId).'</g:mpn>'."\r\n";
+            echo '<g:identifier_exists>no</g:identifier_exists>'."\r\n";
+            if ('' !== $PdtType) {
+                echo '<g:product_type>'.$xml($PdtType).'</g:product_type>'."\r\n";
+            }
+            echo '<g:custom_label_0>'.$xml($Pdt['line_title']).'</g:custom_label_0>'."\r\n";
+
+            // Preço só quando cadastrado (o site hoje é catálogo, sem preço)
+            if ((float) $Pdt['pdt_price'] > 0) {
+                echo '<g:price>'.\number_format((float) $Pdt['pdt_price'], 2, '.', '').' BRL</g:price>'."\r\n";
+
+                $OfferStart = \strtotime((string) $Pdt['pdt_offer_start']);
+                $OfferEnd = \strtotime((string) $Pdt['pdt_offer_end']);
+                if ((float) $Pdt['pdt_offer_price'] > 0 && (float) $Pdt['pdt_offer_price'] < (float) $Pdt['pdt_price'] && $OfferStart && $OfferEnd && $OfferEnd > \time()) {
+                    echo '<g:sale_price>'.\number_format((float) $Pdt['pdt_offer_price'], 2, '.', '').' BRL</g:sale_price>'."\r\n";
+                    echo '<g:sale_price_effective_date>'.\date('c', $OfferStart).'/'.\date('c', $OfferEnd).'</g:sale_price_effective_date>'."\r\n";
+                }
+            }
+            echo '</item>'."\r\n";
+        }
+
+        break;
+
     /* case('products'):
          $Read->exeRead(DB_PDT_TRAVI, "WHERE pdt_inventory >= 1 AND pdt_status = 1 ORDER BY pdt_created DESC");
          if ($Read->getResult()):

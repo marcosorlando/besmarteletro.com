@@ -31,11 +31,13 @@ if ($RepresentativeId) {
             $Admin['user_name']
         );
         header('Location: dashboard.php?wc=representatives/home');
+        exit;
     }
 } else {
     $RepresentativeCreate = ['rep_created' => date('Y-m-d H:i:s')];
     $Create->exeCreate(DB_REPRESENTATIVES, $RepresentativeCreate);
     header('Location: dashboard.php?wc=representatives/create&id=' . $Create->getResult());
+    exit;
 }
 ?>
 

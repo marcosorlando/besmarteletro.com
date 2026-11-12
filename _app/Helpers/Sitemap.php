@@ -5,7 +5,6 @@ namespace App\Helpers;
 use App\Conn\Read;
 
 use function constant;
-use function curl_close;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
@@ -16,11 +15,13 @@ use function getenv;
 use function gzclose;
 use function gzopen;
 use function gzwrite;
+use function htmlspecialchars;
 use function in_array;
 use function is_array;
 use function is_bool;
 use function is_int;
 use function is_string;
+use function str_ends_with;
 use function strtolower;
 use function strtotime;
 use function time;
@@ -155,6 +156,35 @@ class Sitemap
             }
         }
 
+        if ($this->isFeatureEnabled('APP_PDT')) {
+            // PRODUCTS CATEGORIES (só as que têm produto ativo; lastmod = produto mais recente)
+            $Read->fullRead(
+                'SELECT c.cat_name, GREATEST(c.cat_created, MAX(p.pdt_created)) AS lastmod FROM ' . DB_PDT_CATS . ' c '
+                . 'INNER JOIN ' . DB_PDT . ' p ON p.pdt_status = 1 '
+                . 'AND (FIND_IN_SET(c.cat_id, p.pdt_category) OR FIND_IN_SET(c.cat_id, p.pdt_subcategory)) '
+                . 'GROUP BY c.cat_id, c.cat_name, c.cat_created ORDER BY c.cat_title ASC'
+            );
+            $productCategories = $Read->getResult();
+            if (is_array($productCategories)) {
+                foreach ($productCategories as $ReadPages) {
+                    $this->addUrl('/produtos/' . $ReadPages['cat_name'], $ReadPages['lastmod'], 'weekly', '0.8');
+                }
+            }
+
+            // PRODUCTS (mesma regra da página do produto: ativo e com linha)
+            $Read->fullRead(
+                'SELECT p.pdt_name, p.pdt_created FROM ' . DB_PDT . ' p '
+                . 'INNER JOIN ' . DB_PDT_LINES . ' l ON l.line_id = p.pdt_line '
+                . 'WHERE p.pdt_status = 1 ORDER BY p.pdt_created DESC'
+            );
+            $products = $Read->getResult();
+            if (is_array($products)) {
+                foreach ($products as $ReadPages) {
+                    $this->addUrl('/produto/' . $ReadPages['pdt_name'], $ReadPages['pdt_created'], 'weekly', '0.9');
+                }
+            }
+        }
+
         if ($this->isFeatureEnabled('APP_PRODUCTS_TRAVI')) {
             // PRODUCTS CATEGORIES
             $Read->fullRead('SELECT cat_name, cat_created FROM ' . DB_PDT_CATS_TRAVI . ' ORDER BY cat_title ASC');
@@ -240,6 +270,26 @@ class Sitemap
         }
     }
 
+    private function addUrl(mixed $path, mixed $date, string $changefreq, string $priority): void
+    {
+
+        if (!is_string($path) || '' === $path || str_ends_with($path, '/')) {
+            return;
+        }
+
+        $timestamp = is_string($date) ? strtotime($date) : false;
+        if (false === $timestamp) {
+            $timestamp = time();
+        }
+
+        $this->sitemap .= '<url>' . "\r\n";
+        $this->sitemap .= '<loc>' . htmlspecialchars(BASE . $path, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc>' . "\r\n";
+        $this->sitemap .= '<lastmod>' . date('Y-m-d\TH:i:sP', $timestamp) . '</lastmod>' . "\r\n";
+        $this->sitemap .= '<changefreq>' . $changefreq . '</changefreq>' . "\r\n";
+        $this->sitemap .= '<priority>' . $priority . '</priority >' . "\r\n";
+        $this->sitemap .= '</url>' . "\r\n";
+    }
+
     private function isFeatureEnabled(string $configName): bool
     {
 
@@ -288,7 +338,6 @@ class Sitemap
             curl_setopt($ch, CURLOPT_HEADER, false);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_exec($ch);
-            curl_close($ch);
         }
     }
 }

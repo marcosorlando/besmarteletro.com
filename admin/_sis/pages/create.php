@@ -33,11 +33,13 @@ if ($PageId) {
             E_USER_NOTICE
         );
         header('Location: dashboard.php?wc=pages/home');
+        exit;
     }
 } else {
     $PageCreate = ['page_date' => date('Y-m-d H:i:s'), 'page_status' => 0];
     $Create->exeCreate(DB_PAGES, $PageCreate);
     header('Location: dashboard.php?wc=pages/create&id=' . $Create->getResult());
+    exit;
 }
 ?>
 

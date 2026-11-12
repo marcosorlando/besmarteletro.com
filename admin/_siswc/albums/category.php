@@ -1,6 +1,8 @@
 <?php
 
 use App\Helpers\Check;
+use App\Conn\Create;
+use App\Conn\Read;
 
 $AdminLevel = LEVEL_WC_PRODUCTS;
 if (!APP_PRODUCTS_TRAVI || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
@@ -31,6 +33,7 @@ if ($CatId) {
             E_USER_NOTICE
         );
         \header('Location: dashboard.php?wc=products/categories');
+        exit;
     }
 } else {
     $Date = \date('Y-m-d H:i:s');
@@ -39,6 +42,7 @@ if ($CatId) {
     $CarCreate = ['cat_name' => $Name, 'cat_created' => $Date];
     $Create->exeCreate(DB_PDT_CATS, $CarCreate);
     \header('Location: dashboard.php?wc=products/category&id='.$Create->getResult());
+    exit;
 }
 ?>
 

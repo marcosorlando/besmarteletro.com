@@ -1395,6 +1395,81 @@ $(
         $(window).load(function () {
             HeaderRender('wc_normalize_height');
         });
+
+        //############## PRODUTOS (CUSTOM BY ALISSON - restaurado da versão de produção)
+        /* OPEN END CLOSE CAT | lista de categorias */
+        $('html').on('click', '.j_cat_open_end_close', function () {
+            if ($(this).parent().find('ul').length) {
+                if ($(this).find('div:first-child i').hasClass('icon-plus')) {
+                    $(this).find('div:first-child i').attr('class', 'icon-minus icon-notext');
+                } else {
+                    $(this).find('div:first-child i').attr('class', 'icon-plus icon-notext');
+                }
+
+                $(this).parent().find('> ul').slideToggle('fast');
+            }
+        });
+
+        /* SELECTION CAT | atualiza o título com as categorias marcadas */
+        $('html').on('click', '.j_category_selection', function () {
+            var string = null;
+
+            $('.j_category_selection').each(function () {
+                if ($(this).is(':checked')) {
+                    if (string) {
+                        string += ', ' + $(this).attr('data-title');
+                    } else {
+                        string = $(this).attr('data-title');
+                    }
+                }
+            });
+
+            if (string) {
+                $('.category_selection_title').html(string);
+            } else {
+                $('.category_selection_title').html('Selecione a(s) Categoria(s)');
+            }
+        });
+
+        /* OPEN END CLOSE SELECTION CAT */
+        $('html').on('click', '.j_open_category_selection', function () {
+            $('.j_category_selection_content').slideToggle('fast');
+        });
+
+        /* REPLY | valida a variação antes de criar */
+        $('html').on('click', '.j_pdt_reply', function () {
+            var link = $(this).attr('href');
+
+            $.post('_ajax/Products.ajax.php', {
+                callback: 'Products',
+                callback_action: 'reply',
+                pdt_id: $(this).attr('id')
+            }, function (data) {
+                if (data.trigger) {
+                    Trigger(data.trigger);
+                } else {
+                    window.location.href = link;
+                }
+            }, 'json');
+
+            return false;
+        });
+
+        /* DESTAQUE | período de divulgação só aparece com o destaque marcado */
+        if ($('#pdt_destaque').length && $('#pdt_destaque').is(':checked')) {
+            $('#period').show();
+            $('input[name=pdt_offer_start],input[name=pdt_offer_end]').prop('required', true);
+        }
+
+        $('#pdt_destaque').on('change', function () {
+            if ($('#pdt_destaque').is(':checked')) {
+                $('#period').slideDown('500');
+                $('input[name=pdt_offer_start],input[name=pdt_offer_end]').removeAttr('disabled').prop('required', true);
+            } else {
+                $('#period').slideUp('500');
+                $('input[name=pdt_offer_start],input[name=pdt_offer_end]').prop('disabled', true);
+            }
+        });
         //WC LOGIN FIX
         setInterval(function () {
             $.post('_ajax/Dashboard.ajax.php', {

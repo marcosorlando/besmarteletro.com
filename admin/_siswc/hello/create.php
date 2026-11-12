@@ -32,11 +32,13 @@ if ($HelloId) {
             E_USER_NOTICE
         );
         \header('Location: dashboard.php?wc=hello/home');
+        exit;
     }
 } else {
     $HelloCreate = ['hello_date' => \date('Y-m-d H:i:s'), 'hello_status' => 0, 'user_id' => $Admin['user_id']];
     $Create->exeCreate(DB_HELLO, $HelloCreate);
     \header('Location: dashboard.php?wc=hello/create&id='.$Create->getResult());
+    exit;
 }
 ?>
 

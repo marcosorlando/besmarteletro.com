@@ -926,7 +926,7 @@ if (!defined('SITE_FONT_NAME')) {
 }
 
 if (!defined('SITE_FONT_WEIGHT')) {
-    define('SITE_FONT_WEIGHT', '300;400;600;700');
+    define('SITE_FONT_WEIGHT', '300;400;500;600;700');
 }
 
 if (!defined('SITE_NAME')) {
@@ -998,11 +998,11 @@ if (!defined('THEME')) {
 }
 
 if (!defined('THUMB_H')) {
-    define('THUMB_H', 800);
+    define('THUMB_H', 1000);
 }
 
 if (!defined('THUMB_W')) {
-    define('THUMB_W', 800);
+    define('THUMB_W', 1000);
 }
 
 if (!defined('VIDEO_H')) {

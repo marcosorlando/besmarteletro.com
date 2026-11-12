@@ -8,7 +8,7 @@
         'SITE_SUBNAME' => 'Eletro',
         'SITE_DESC' => 'Bem-vindo à BE.SMART, o seu destino para uma vida inteligente e conectada em sua casa. Nós somos mais do que uma loja de eletrodomésticos; somos seus parceiros na busca por praticidade, eficiência e inovação para tornar o seu lar mais inteligente.',
         'SITE_FONT_NAME' => 'Barlow+Semi+Condensed',
-        'SITE_FONT_WEIGHT' => '300;400;600;700',
+        'SITE_FONT_WEIGHT' => '300;400;500;600;700',
 
         // Dados do cliente
         'SITE_ADDR_NAME' => 'BE.SMART',

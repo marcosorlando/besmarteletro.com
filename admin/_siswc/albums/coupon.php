@@ -33,11 +33,13 @@ if ($CouponId) {
             E_USER_NOTICE
         );
         \header('Location: dashboard.php?wc=products/coupons');
+        exit;
     }
 } else {
     $CarCreate = ['cp_start' => \date('Y-m-d H:i:s'), 'cp_end' => \date('Y-m-d H:i:s', \strtotime('+30day'))];
     $Create->exeCreate(DB_PDT_COUPONS, $CarCreate);
     \header('Location: dashboard.php?wc=products/coupon&id='.$Create->getResult());
+    exit;
 }
 ?>
 

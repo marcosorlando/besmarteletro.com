@@ -40,6 +40,7 @@ if ($SegId) {
     ];
     $Create->exeCreate(DB_SEG, $SegCreate);
     header('Location: dashboard.php?wc=segments/create&id=' . $Create->getResult());
+    exit;
 }
 
 $Search = filter_input_array(INPUT_POST);

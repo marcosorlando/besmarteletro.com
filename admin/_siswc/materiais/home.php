@@ -21,6 +21,7 @@ $Search = filter_input_array(INPUT_POST);
 if ($Search && $Search['s']) {
     $S = urlencode((string)$Search['s']);
     header('Location: dashboard.php?wc=materiais/search&s=' . $S);
+    exit;
 }
 ?>
 

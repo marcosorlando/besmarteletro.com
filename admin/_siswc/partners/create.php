@@ -32,11 +32,13 @@ if ($PartnerId) {
             $Admin['user_name']
         );
         header('Location: dashboard.php?wc=partners/home');
+        exit;
     }
 } else {
     $PartnerCreate = ['partner_name' => '', 'partner_page' => ''];
     $Create->exeCreate(DB_PARTNERS, $PartnerCreate);
     header('Location: dashboard.php?wc=partners/create&id=' . $Create->getResult());
+    exit;
 }
 ?>
 

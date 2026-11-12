@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use function curl_close;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
@@ -46,7 +45,6 @@ class Googl
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
         $response = curl_exec($ch);
-        curl_close($ch);
 
         if (false === $response) {
             return null;

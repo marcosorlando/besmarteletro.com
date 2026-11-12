@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Check;
+use App\Conn\Read;
 
 $AdminLevel = LEVEL_WC_CONFIG_CODES;
 if (empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {

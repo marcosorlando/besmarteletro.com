@@ -1,7 +1,7 @@
 /*
- * CSS padrÃ£o do Work Control PRO Content Manager.
+ * CSS padrão do Work Control PRO Content Manager.
  * Created on : 06/01/2016, 11:15:33
- * Author     : Zen AgÃªncia Web
+ * Author     : Zen Agência Web
 */
 
 /***********************************
@@ -523,7 +523,7 @@
 }
 
 .dashboard_nav_menu_active > a:after {
-    content: "Â«";
+    content: "«";
     float: right;
 }
 
@@ -1269,6 +1269,11 @@ div.mce-fullscreen {
 .category_selection {
     display: block;
     margin-bottom: 15px;
+}
+
+/* o seletor cresce ao abrir: alinha o label_50 pelo topo para o campo vizinho (Linha) não descer */
+.label_50:has(.category_selection) {
+    align-items: flex-start;
 }
 
 .category_selection .category_selection_legend {
@@ -2551,7 +2556,7 @@ div.mce-fullscreen {
     color: #111111;
 }
 
-/*320px Ã¡ 479*/
+/*320px á 479*/
 @media (min-width: 20em) and (max-width: 29.9375em) {
     .combo_box_item {
         display: inline-block;
@@ -2573,7 +2578,7 @@ div.mce-fullscreen {
     }
 }
 
-/*480px Ã¡ 639*/
+/*480px á 639*/
 @media (min-width: 30em) and (max-width: 39.9375em) {
     .combo_box_item {
         display: inline-block;
@@ -2599,7 +2604,7 @@ div.mce-fullscreen {
     }
 }
 
-/*640px Ã¡ 799*/
+/*640px á 799*/
 @media (min-width: 40em) and (max-width: 49.9375em) {
     .combo_box_item {
         display: inline-block;
@@ -2629,7 +2634,7 @@ div.mce-fullscreen {
     }
 }
 
-/*800px Ã¡ 959*/
+/*800px á 959*/
 @media (min-width: 50em) and (max-width: 59.9375em) {
     .combo_box_item {
         display: inline-block;
@@ -3376,7 +3381,7 @@ div.mce-fullscreen {
 }
 
 /***********************************
-############ USUï¿½?RIOS ##############
+############ USU�?RIOS ##############
 ***********************************/
 .single_user .box_content {
     padding: 25px;
@@ -3659,7 +3664,7 @@ div.mce-fullscreen {
 }
 
 /***********************************
-############ CONFIGURAÃ‡Ã•ES #########
+############ CONFIGURAÇÕES #########
 ***********************************/
 .box_conf.conf {
     padding-top: 0;
@@ -3706,7 +3711,7 @@ div.mce-fullscreen {
 }
 
 .box_conf_menu a:before {
-    content: "â‡° ";
+    content: "⇰ ";
 }
 
 .box_conf_menu.no_icon a:before {

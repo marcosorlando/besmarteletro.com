@@ -28,6 +28,7 @@ if ($PostId) {
             $Admin['user_name']
         );
         \header('Location: dashboard.php?wc=posts/home');
+        exit;
     }
 } else {
     $PostCreate = [
@@ -38,6 +39,7 @@ if ($PostId) {
     ];
     $Create->exeCreate(DB_POSTS, $PostCreate);
     \header('Location: dashboard.php?wc=posts/create&id='.$Create->getResult());
+    exit;
 }
 ?>
 

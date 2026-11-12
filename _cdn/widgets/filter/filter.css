@@ -235,8 +235,13 @@ FILTER
     padding: 0 10px;
     /* margin-top: 10px; */
     overflow-y: auto;
-    overflow: hidden;
     border-right: 3px solid #ffffff;
+}
+
+/* categorias: lista completa (o limite de 100px cortava a partir do 3º item) */
+.workcontrol_filter_form_item.department .workcontrol_filter_form_item_options {
+    max-height: none;
+    overflow: visible;
 }
 
 .workcontrol_filter_form_item.brand .workcontrol_filter_form_item_options::-webkit-scrollbar,
@@ -326,12 +331,28 @@ FILTER
     color: var(--color-text-one);
 }
 
+/* checkbox visível para deixar claro o que está selecionado */
 .workcontrol_filter_form_item.department label input {
-    display: none;
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0 10px 0 0;
+    accent-color: var(--color-background-four);
+    cursor: pointer;
+}
+
+.workcontrol_filter_form_item.department label {
+    cursor: pointer;
+}
+
+.workcontrol_filter_form_item.department label span small {
+    font-size: 0.85em;
+    font-weight: 400;
+    opacity: 0.7;
 }
 
 .workcontrol_filter_form_item.department label span {
-    font-size: 0.9125em;
+    font-size: 0.8em;
     text-transform: uppercase;
 }
 
@@ -547,4 +568,36 @@ FILTER
     _:-ms-lang(x), .workcontrol_filter {
         left: 5% !important;
     }
+}
+
+/* atualização via ajax: esmaece a lista enquanto carrega */
+section.products {
+    transition: opacity 0.2s ease-in-out;
+}
+
+section.products.workcontrol_filter_loading {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* limpar filtros */
+.workcontrol_filter_clear {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 10px;
+    padding: 8px 10px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-one);
+    background-color: transparent;
+    border: 1px solid #cccccc;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.workcontrol_filter_clear:hover {
+    color: var(--color-text-two);
+    border-color: var(--color-text-two);
 }

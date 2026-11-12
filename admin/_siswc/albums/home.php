@@ -4,6 +4,7 @@ use App\Conn\Delete;
 use App\Conn\Read;
 use App\Helpers\Check;
 use App\Models\Pager;
+use App\Conn\Create;
 
 $AdminLevel = LEVEL_WC_ALBUMS;
 if (!APP_ALBUMS || empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
@@ -58,6 +59,7 @@ if ($Search) {
     $S = \urlencode((string) $Search['s']);
     $O = \urlencode((string) $Search['opt']);
     \header(\sprintf('Location: dashboard.php?wc=albums/home&opt=%s&s=%s', $O, $S));
+    exit;
 }
 ?>
 
