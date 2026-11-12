@@ -1,25 +1,27 @@
 <?php
 
-use App\Helpers\Check;
-use App\Conn\Read;
+    use App\Conn\Read;
+    use App\Helpers\Check;
 
-$AdminLevel = LEVEL_WC_CONFIG_CODES;
-if (empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
-    exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
-}
+    $AdminLevel = LEVEL_WC_CONFIG_CODES;
+    if (empty($DashboardLogin) || empty($Admin) || $Admin['user_level'] < $AdminLevel) {
+        exit('<div style="text-align: center; margin: 5% 0; color: #C54550; font-size: 1.6em; font-weight: 400; background: #fff; float: left; width: 100%; padding: 30px 0;"><b>ACESSO NEGADO:</b> Você não esta logado<br>ou não tem permissão para acessar essa página!</div>');
+    }
 
-// AUTO INSTANCE OBJECT READ
-$Read ??= new Read();
+    // AUTO INSTANCE OBJECT READ
+    $Read ??= new Read();
 
 ?>
 
 <header class="dashboard_header">
 	<div class="dashboard_header_title">
-		<h1 class="icon-cog">Work Control Codes</h1>
+		<h1 class="icon-cog">Zen Control Codes</h1>
 		<p class="dashboard_header_breadcrumbs">
-			&raquo; <?php echo ADMIN_NAME; ?>
+			&raquo; <?php
+                echo ADMIN_NAME; ?>
 			<span class="crumb">/</span>
-			<a title="<?php echo ADMIN_NAME; ?>" href="dashboard.php?wc=config/home">Configurações</a>
+			<a title="<?php
+                echo ADMIN_NAME; ?>" href="dashboard.php?wc=config/home">Configurações</a>
 			<span class="crumb">/</span>
 			Codes
 		</p>
@@ -38,7 +40,7 @@ $Read ??= new Read();
 			<input type="hidden" name="callback_action" value="workcodes"/>
 			<input type="hidden" name="code_id" value=""/>
 
-			<p class="wc_codes_create_form_title">Novo Code Work Control:</p>
+			<p class="wc_codes_create_form_title">Novo Code Zen Control:</p>
 			<label>
 				<span>Título de Identificação: (ex: Google analitycs)</span>
 				<input type="text" name="code_name" placeholder="Título:" required/>
@@ -70,42 +72,51 @@ $Read ??= new Read();
 	</div>
 
     <?php
-    $Read->exeRead(DB_WC_CODE, 'ORDER BY code_created DESC');
-if (!$Read->getResult()) {
-    echo Check::erro(
-        \sprintf(
-            "<span class='al_center icon-notification'>Ainda não existem Codes cadastrados %s. Comece a reastrar seus resultados agora cadastrando seus codes!</span>",
-            $Admin['user_name']
-        ),
-        E_USER_NOTICE
-    );
-} else {
-    foreach ($Read->getResult() as $CODE) {
-        \extract($CODE);
-        ?>
-			<article class="box box25 code_single" id="<?php echo $code_id; ?>">
-				<header>
-					<h1><?php echo $code_name; ?></h1>
-				</header>
-				<div class="box_content al_center" id="<?php echo $code_id; ?>">
-					<div class="codes_loaded"><?php echo \date('d/m/Y H:i:s', \strtotime((string) $code_created)); ?>
-						<span><?php echo \str_pad(
-						    (string) $code_views,
-						    5,
-						    0,
-						    0
-						); ?></span><?php echo empty($code_condition) ? '√ Pixel carregado sempre e em todas as páginas do site!' : $code_condition; ?>
+        $Read->exeRead(DB_WC_CODE, 'ORDER BY code_created DESC');
+        if (!$Read->getResult()) {
+            echo Check::erro(
+                \sprintf(
+                    "Ainda não existem Codes cadastrados %s. Comece a reastrar seus resultados agora cadastrando seus codes!",
+                    $Admin['user_name']
+                ),
+                E_USER_NOTICE
+            );
+        } else {
+            foreach ($Read->getResult() as $CODE) {
+                \extract($CODE);
+                ?>
+				<article class="box box25 code_single" id="<?php
+                    echo $code_id; ?>">
+					<header>
+						<h1><?php
+                                echo $code_name; ?></h1>
+					</header>
+					<div class="box_content al_center" id="<?php
+                        echo $code_id; ?>">
+						<div class="codes_loaded"><?php
+                                echo \date('d/m/Y H:i:s', \strtotime((string)$code_created)); ?>
+							<span><?php
+                                    echo \str_pad(
+                                        (string)$code_views,
+                                        5,
+                                        0,
+                                        0
+                                    ); ?></span><?php
+                                echo empty($code_condition) ? '√ Pixel carregado sempre e em todas as páginas do site!' : $code_condition; ?>
+						</div>
+						<span class="btn btn_blue jwc_codes_edit icon-pencil" id="<?php
+                            echo $code_id; ?>">Editar</span>
+						<span rel="code_single" class="j_delete_action icon-cancel-circle btn btn_red"
+						      id="<?php
+                                  echo $code_id; ?>">Excluir</span>
+						<span rel="code_single" callback="Codes" callback_action="delete"
+						      class="j_delete_action_confirm icon-warning btn btn_yellow" style="display: none"
+						      id="<?php
+                                  echo $code_id; ?>">Excluir agora?</span>
 					</div>
-					<span class="btn btn_blue jwc_codes_edit icon-pencil" id="<?php echo $code_id; ?>">Editar</span>
-					<span rel="code_single" class="j_delete_action icon-cancel-circle btn btn_red"
-					      id="<?php echo $code_id; ?>">Excluir</span>
-					<span rel="code_single" callback="Codes" callback_action="delete"
-					      class="j_delete_action_confirm icon-warning btn btn_yellow" style="display: none"
-					      id="<?php echo $code_id; ?>">Excluir agora?</span>
-				</div>
-			</article>
-        <?php
-    }
-}
-?>
+				</article>
+                <?php
+            }
+        }
+    ?>
 </div>

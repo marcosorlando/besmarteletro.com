@@ -82,7 +82,7 @@ if (DB_AUTO_TRASH) {
     <?php
     /* $Read->exeRead(DB_PDT_CATS, "WHERE cat_parent IS NULL ORDER BY cat_title ASC");
       if (!$Read->getResult()) {
-      echo Check::erro("<span class='al_center icon-notification'>Ainda não existem categorias de produtos cadastradas {$Admin['user_name']}. Comece agora mesmo criando seu primeiro setor, e então suas categorias!</span>", E_USER_NOTICE);
+      echo Check::erro("Ainda não existem categorias de produtos cadastradas {$Admin['user_name']}. Comece agora mesmo criando seu primeiro setor, e então suas categorias!", E_USER_NOTICE);
       } else {
       foreach ($Read->getResult() as $Sector) {
       $Read->fullRead("SELECT count(pdt_id) AS total FROM " . DB_PDT . " WHERE pdt_category = :sector", "sector={$Sector['cat_id']}");

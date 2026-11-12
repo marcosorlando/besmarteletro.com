@@ -1,6 +1,5 @@
-
 /*
- * Biblioteca de eventos jQuery do Painel Work Control Pro Content Manager
+ * Biblioteca de eventos jQuery do Painel Zen Control Pro Content Manager
  * Created on : 06/01/2016, 11:15:16
  * Author     : Zen Agência Web
  */
@@ -1395,7 +1394,7 @@ $(
         $(window).load(function () {
             HeaderRender('wc_normalize_height');
         });
-
+        
         //############## PRODUTOS (CUSTOM BY ALISSON - restaurado da versão de produção)
         /* OPEN END CLOSE CAT | lista de categorias */
         $('html').on('click', '.j_cat_open_end_close', function () {
@@ -1405,15 +1404,15 @@ $(
                 } else {
                     $(this).find('div:first-child i').attr('class', 'icon-plus icon-notext');
                 }
-
+                
                 $(this).parent().find('> ul').slideToggle('fast');
             }
         });
-
+        
         /* SELECTION CAT | atualiza o título com as categorias marcadas */
         $('html').on('click', '.j_category_selection', function () {
             var string = null;
-
+            
             $('.j_category_selection').each(function () {
                 if ($(this).is(':checked')) {
                     if (string) {
@@ -1423,23 +1422,23 @@ $(
                     }
                 }
             });
-
+            
             if (string) {
                 $('.category_selection_title').html(string);
             } else {
                 $('.category_selection_title').html('Selecione a(s) Categoria(s)');
             }
         });
-
+        
         /* OPEN END CLOSE SELECTION CAT */
         $('html').on('click', '.j_open_category_selection', function () {
             $('.j_category_selection_content').slideToggle('fast');
         });
-
+        
         /* REPLY | valida a variação antes de criar */
         $('html').on('click', '.j_pdt_reply', function () {
             var link = $(this).attr('href');
-
+            
             $.post('_ajax/Products.ajax.php', {
                 callback: 'Products',
                 callback_action: 'reply',
@@ -1451,16 +1450,16 @@ $(
                     window.location.href = link;
                 }
             }, 'json');
-
+            
             return false;
         });
-
+        
         /* DESTAQUE | período de divulgação só aparece com o destaque marcado */
         if ($('#pdt_destaque').length && $('#pdt_destaque').is(':checked')) {
             $('#period').show();
             $('input[name=pdt_offer_start],input[name=pdt_offer_end]').prop('required', true);
         }
-
+        
         $('#pdt_destaque').on('change', function () {
             if ($('#pdt_destaque').is(':checked')) {
                 $('#period').slideDown('500');
@@ -1544,40 +1543,37 @@ $(
         });
         /* SLIDES CONTROL */
         /* CUSTOM BY MARCOS */
-        $(document).on("ready click", function () {
-            
-            if ($("input[name=show_headline]").is(":checked")) {
-                $("input[name=slide_headline]").removeAttr('disabled');
-                $("input[name=slide_headline]").parent().fadeIn();
+        // Cada checkbox mostra/oculta os seus campos. Campo visível fica habilitado e obrigatório;
+        // campo oculto fica desabilitado (não é enviado nem validado, e o valor salvo é mantido).
+        var wcSlideFields = {
+            show_title: 'input[name=slide_title]',
+            show_headline: 'input[name=slide_headline]',
+            show_desc: 'textarea[name=slide_desc]',
+            show_complement: 'textarea[name=slide_complement]',
+            slide_product: 'input[name=slide_link_pdt], input[name=slide_link_pdt_btn]',
+            slide_category: 'input[name=slide_link_cat], input[name=slide_link_cat_btn]'
+        };
+        var wcSlideChecks = $.map(wcSlideFields, function (fields, name) {
+            return 'input[name=' + name + ']';
+        }).join(', ');
+
+        function wcSlideToggle(check, speed) {
+            var fields = check.closest('form').find(wcSlideFields[check.attr('name')]);
+            var show = check.is(':checked');
+
+            fields.prop('disabled', !show).prop('required', show);
+            if (speed) {
+                fields.closest('label')[show ? 'fadeIn' : 'fadeOut'](speed);
             } else {
-                $("input[name=slide_headline]").prop('disabled', true);
-                $("input[name=slide_headline]").parent().fadeOut();
+                fields.closest('label').toggle(show);
             }
-            if ($("input[name=show_desc]").is(":checked")) {
-                $("textarea[name=slide_desc]").removeAttr('disabled');
-                $("textarea[name=slide_desc]").parent().fadeIn();
-            } else {
-                $("textarea[name=slide_desc]").prop('disabled', true);
-                $("textarea[name=slide_desc]").parent().fadeOut();
-            }
-            
-            //LINKS
-            if ($("input[name=slide_product]").is(":checked")) {
-                $("input[name=slide_link_pdt], input[name=slide_link_pdt_btn]").removeAttr('disabled');
-                $("input[name=slide_link_pdt], input[name=slide_link_pdt_btn] ").parent().fadeIn();
-            } else {
-                $("input[name=slide_link_pdt], input[name=slide_link_pdt_btn]").prop('disabled', true);
-                $("input[name=slide_link_pdt], input[name=slide_link_pdt_btn] ").parent().fadeOut();
-            }
-            
-            if ($("input[name=slide_category]").is(":checked")) {
-                $("input[name=slide_link_cat], input[name=slide_link_cat_btn]").removeAttr('disabled');
-                $("input[name=slide_link_cat], input[name=slide_link_cat_btn] ").parent().fadeIn();
-            } else {
-                $("input[name=slide_link_cat], input[name=slide_link_cat_btn]").prop('disabled', true);
-                $("input[name=slide_link_cat], input[name=slide_link_cat_btn] ").parent().fadeOut();
-            }
-            
+        }
+
+        $('html').on('change', wcSlideChecks, function () {
+            wcSlideToggle($(this), 200);
+        });
+        $(wcSlideChecks).each(function () {
+            wcSlideToggle($(this), 0);
         });
     }
 );

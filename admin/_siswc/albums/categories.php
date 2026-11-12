@@ -45,7 +45,7 @@ if (DB_AUTO_TRASH !== 0) {
 if (!$Read->getResult()) {
     echo Check::erro(
         \sprintf(
-            "<span class='al_center icon-notification'>Ainda não existem categorias de produtos cadastradas %s. Comece agora mesmo criando seu primeiro setor, e então suas categorias!</span>",
+            "Ainda não existem categorias de produtos cadastradas %s. Comece agora mesmo criando seu primeiro setor, e então suas categorias!",
             $Admin['user_name']
         ),
         E_USER_NOTICE

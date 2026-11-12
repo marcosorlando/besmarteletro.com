@@ -50,7 +50,7 @@ if (DB_AUTO_TRASH) {
     $Read->exeRead(DB_PDT_COUPONS, "ORDER BY cp_end DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
     if (!$Read->getResult()) {
         $Pager->returnPage();
-        echo Check::erro("<span class='al_center icon-notification'>Ainda não existem cupons de desconto cadastrados {$Admin['user_name']}. Comece agora mesmo criando uma nova oferta e aumente suas conversões!</span>", E_USER_NOTICE);
+        echo Check::erro("Ainda não existem cupons de desconto cadastrados {$Admin['user_name']}. Comece agora mesmo criando uma nova oferta e aumente suas conversões!", E_USER_NOTICE);
     } else {
         foreach ($Read->getResult() as $Coupon) {
             $Active = ($Coupon['cp_start'] <= date('Y-m-d H:i:s') && $Coupon['cp_end'] >= date('Y-m-d H:i:s') ? 'active' : '');

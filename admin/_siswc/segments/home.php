@@ -103,7 +103,7 @@ if ($Search) {
         $Pager->returnPage();
         echo Check::erro(
             sprintf(
-                "<span class='al_center icon-notification'>Ainda não existem segmentos cadastrados %s. Comece agora mesmo criando seu primeiro segmento!</span>",
+                "Ainda não existem segmentos cadastrados %s. Comece agora mesmo criando seu primeiro segmento!",
                 $Admin['user_name']
             ),
             E_USER_NOTICE

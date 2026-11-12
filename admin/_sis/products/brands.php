@@ -44,7 +44,7 @@ if (DB_AUTO_TRASH) {
     <?php
     $Read->exeRead(DB_PDT_BRANDS, "ORDER By brand_title ASC");
     if (!$Read->getResult()) {
-        echo Check::erro("<span class='al_center icon-notification'>Ainda não existem marcas ou fabricantes cadastradas {$Admin['user_name']}. Comece agora mesmo criando suas marcas e fabricantes de produtos!</span>", E_USER_NOTICE);
+        echo Check::erro("Ainda não existem marcas ou fabricantes cadastradas {$Admin['user_name']}. Comece agora mesmo criando suas marcas e fabricantes de produtos!", E_USER_NOTICE);
     } else {
         foreach ($Read->getResult() as $Brand) {
             $Read->fullRead("SELECT count(pdt_id) as total FROM " . DB_PDT . " WHERE pdt_brand = :brand", "brand={$Brand['brand_id']}");

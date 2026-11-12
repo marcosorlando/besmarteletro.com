@@ -90,8 +90,8 @@ use App\Models\Pager;
         if (!$Read->getResult()) {
             $Pager->returnPage();
             echo Check::erro(('' !== $S || $WhereOpt
-                ? "<span class='al_center icon-notification'>Nenhum produto encontrado para este filtro, {$Admin['user_name']}.</span>"
-                : "<span class='al_center icon-notification'>Ainda não existem produtos cadastrados {$Admin['user_name']}. Comece agora mesmo criando seu primeiro produto!</span>"), E_USER_NOTICE);
+                ? "Nenhum produto encontrado para este filtro, {$Admin['user_name']}."
+                : "Ainda não existem produtos cadastrados {$Admin['user_name']}. Comece agora mesmo criando seu primeiro produto!"), E_USER_NOTICE);
         } else {
             foreach ($Read->getResult() as $Products) {
                 extract($Products);

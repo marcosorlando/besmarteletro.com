@@ -69,7 +69,7 @@ if ($Search && !empty($Search['s'])) {
 
     if (!$Read->getResult()) {
         $Pager->returnPage();
-        echo Check::erro("<span class='al_center icon-notification'>Ainda não existem linhas cadastradas {$Admin['user_name']}. Comece agora mesmo cadastrando uma nova linha.</span>", E_USER_NOTICE);
+        echo Check::erro("Ainda não existem linhas cadastradas {$Admin['user_name']}. Comece agora mesmo cadastrando uma nova linha.", E_USER_NOTICE);
     } else {
         foreach ($Read->getResult() as $Lines) {
             extract($Lines);

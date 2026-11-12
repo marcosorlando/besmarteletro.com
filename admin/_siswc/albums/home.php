@@ -117,7 +117,7 @@ if (!$Read->getResult()) {
     $Pager->returnPage();
     echo Check::erro(
         \sprintf(
-            "<span class='al_center icon-notification'>Ainda não existem álbuns cadastrados %s. Comece agora mesmo criando seu primeiro álbum!</span>",
+            "Ainda não existem álbuns cadastrados %s. Comece agora mesmo criando seu primeiro álbum!",
             $Admin['user_name']
         ),
         E_USER_NOTICE

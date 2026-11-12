@@ -44,7 +44,7 @@ if (DB_AUTO_TRASH !== 0) {
         $Read->exeRead(DB_SLIDES, "WHERE slide_status = 1 AND slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL) ORDER BY slide_date DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
         if (!$Read->getResult()) {
             $Pager->returnPage();
-            echo Check::erro("<span class='al_center icon-notification'>Ainda não existem conteúdos em destaque cadastrados em seu site. Comece cadastrando o primeiro!</span>", E_USER_NOTICE);
+            echo Check::erro("Ainda não existem conteúdos em destaque cadastrados em seu site. Comece cadastrando o primeiro!", E_USER_NOTICE);
         } else {
             foreach ($Read->getResult() as $Slide) {
                 extract($Slide);
@@ -83,7 +83,7 @@ if (DB_AUTO_TRASH !== 0) {
                 </article>";
             }
 
-            $Pager->exePaginator(DB_SLIDES, "WHERE slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL)");
+            $Pager->exePaginator(DB_SLIDES, "WHERE slide_status = 1 AND slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL)");
             echo $Pager->getPaginator();
         }
     ?>

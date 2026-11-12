@@ -213,15 +213,15 @@ if ($SlideId) {
 					<label class="label">
 						<span class="legend">A partir de:</span>
 						<input style="font-size: 1.2em;" type="text" class="formTime" name="slide_start"
-						       value="<?= (!empty($slide_start) ? date('d/m/Y H:i:s',
-							       strtotime($slide_start)) : date('d/m/Y H:i:s')); ?>" required/>
+						       value="<?= (!empty($slide_start) ? date('d/m/Y H:i',
+							       strtotime($slide_start)) : date('d/m/Y H:i')); ?>" required/>
 					</label>
 
 					<label class="label">
-						<span class="legend">Até dia: (opcional)</span>
+						<span class="legend">Até dia: (opcional, vazio = exibe sempre)</span>
 						<input style="font-size: 1.2em;" type="text" class="formTime" name="slide_end"
-						       value="<?= (!empty($slide_end) ? date('d/m/Y H:i:s',
-							       strtotime($slide_end)) : date('d/m/Y H:i:s', strtotime("+1month"))); ?>"/>
+						       placeholder="Sem data final: exibe sempre"
+						       value="<?= (!empty($slide_end) ? date('d/m/Y H:i', strtotime($slide_end)) : ''); ?>"/>
 					</label>
 				</div>
 

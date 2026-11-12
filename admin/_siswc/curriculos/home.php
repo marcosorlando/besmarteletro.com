@@ -89,7 +89,7 @@ $Read->fullRead('SELECT DISTINCT(area) FROM ' . DB_CV . ' WHERE status = :st', '
     if (!$Read->getResult()) {
         $Pager->returnPage();
         echo Check::erro(
-            "<span class='al_center icon-notification'>Não encontramos nenhum currículo para sua busca. Experimente novamente com filtro de todas as áreas.</span>",
+            "Não encontramos nenhum currículo para sua busca. Experimente novamente com filtro de todas as áreas.",
             E_USER_NOTICE
         );
     } else {

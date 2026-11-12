@@ -98,7 +98,7 @@ if ($Search && (isset($Search['s']) || isset($Search['status']))) {
         $Paginator->returnPage();
         echo Check::erro(
             sprintf(
-                "<span class='al_center icon-notification'>Ainda não existem parceiros cadastrados %s. Comece agora mesmo criando seu primeiro parceiro!</span>",
+                "Ainda não existem parceiros cadastrados %s. Comece agora mesmo criando seu primeiro parceiro!",
                 $Admin['user_name']
             ),
             E_USER_NOTICE

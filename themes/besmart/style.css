@@ -2491,6 +2491,7 @@ PRODUCT
 .product_image_focus {
     margin-bottom: 5px;
     position: relative;
+    cursor: zoom-in;
 }
 
 .product_image_focus .voltage {

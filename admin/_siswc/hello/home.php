@@ -50,7 +50,7 @@ if (!$Read->getResult()) {
     $Paginator->returnPage();
     echo Check::erro(
         \sprintf(
-            "<span class='al_center icon-notification'>Ainda não existem hello bars cadastrados %s. Comece agora mesmo criando sua primeira hello!</span>",
+            "Ainda não existem hello bars cadastrados %s. Comece agora mesmo criando sua primeira hello!",
             $Admin['user_name']
         ),
         E_USER_NOTICE

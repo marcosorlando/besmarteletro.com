@@ -46,7 +46,7 @@ if (DB_AUTO_TRASH !== 0) {
     $Read->exeRead(DB_SLIDES, "WHERE slide_status != 1 OR (slide_start >= NOW() OR slide_end <= NOW()) ORDER BY slide_date DESC LIMIT :limit OFFSET :offset", "limit={$Pager->getLimit()}&offset={$Pager->getOffset()}");
     if (!$Read->getResult()) {
         $Pager->returnPage();
-        echo Check::erro("<span class='al_center icon-notification'>Não existe conteúdo em destaque inativos em seu site. Os destaques expirados ou fora de data são apresentados aqui!</span>", E_USER_NOTICE);
+        echo Check::erro("Não existe conteúdo em destaque inativos em seu site. Os destaques expirados ou fora de data são apresentados aqui!", E_USER_NOTICE);
     } else {
         foreach ($Read->getResult() as $Slide) {
             extract($Slide);
@@ -64,7 +64,7 @@ if (DB_AUTO_TRASH !== 0) {
                 </article>";
         }
 
-        $Pager->exePaginator(DB_SLIDES, "WHERE slide_start <= NOW() AND (slide_end >= NOW() OR slide_end IS NULL)");
+        $Pager->exePaginator(DB_SLIDES, "WHERE slide_status != 1 OR (slide_start >= NOW() OR slide_end <= NOW())");
         echo $Pager->getPaginator();
     }
     ?>

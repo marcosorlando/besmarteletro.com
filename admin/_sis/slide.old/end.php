@@ -58,7 +58,7 @@ if (DB_AUTO_TRASH !== 0) {
     if (!$Read->getResult()) {
         $Pager->returnPage();
         echo Check::erro(
-            "<span class='al_center icon-notification'>Não existe conteúdo em destaque inativos em seu site. Os destaques expirados ou fora de data são apresentados aqui!</span>",
+            "Não existe conteúdo em destaque inativos em seu site. Os destaques expirados ou fora de data são apresentados aqui!",
             E_USER_NOTICE
         );
     } else {

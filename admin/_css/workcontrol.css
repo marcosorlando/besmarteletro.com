@@ -1,5 +1,5 @@
 /*
- * CSS padrão do Work Control PRO Content Manager.
+ * CSS padrão do Zen Control PRO Content Manager.
  * Created on : 06/01/2016, 11:15:33
  * Author     : Zen Agência Web
 */
@@ -1768,7 +1768,10 @@ div.mce-fullscreen {
     float: left;
 }
 
-.workcontrol_pdt_stock p {font-weight: 500; line-height: 44px;}
+.workcontrol_pdt_stock p {
+    font-weight: 500;
+    line-height: 44px;
+}
 
 .workcontrol_pdt_stock form input {
     display: inline-block;
@@ -3101,7 +3104,7 @@ div.mce-fullscreen {
     font-weight: bold;
 }
 
-.attr_group_item .attr_group_item_remove{
+.attr_group_item .attr_group_item_remove {
     -webkit-display: -webkit-box;
     -webkit-display: -webkit-flex;
     display: -webkit-box;
@@ -3137,6 +3140,7 @@ div.mce-fullscreen {
     -o-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
+
 .attr_group_item .attr_group_item_edit {
     -webkit-display: -webkit-box;
     -webkit-display: -webkit-flex;
@@ -3180,7 +3184,7 @@ div.mce-fullscreen {
 }
 
 .attr_group_item .attr_group_item_remove.j_delete_action_confirm {
-    background-color: #FAAD50;
+    background-color: #faad50;
 }
 
 .attr_group_item .attr_group_item_remove:hover {
@@ -5202,7 +5206,7 @@ div.mce-fullscreen {
 }
 
 .wc_actions {
-    background-color: #E2E6EA;
+    background-color: #e2e6ea;
     padding: 10px;
     margin: 1rem auto;
     display: flex;

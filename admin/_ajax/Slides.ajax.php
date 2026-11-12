@@ -55,25 +55,38 @@ if ($PostData && $PostData['callback_action'] && $PostData['callback'] == $CallB
     switch ($Case) {
         //GERENCIA
         case 'manager':
-            $SlideId = $PostData['slide_id'];
-            $SlideEnd = (!empty($PostData['slide_end']) ? $PostData['slide_end'] : null);
+            $SlideId = (int) $PostData['slide_id'];
+            // Data final vazia = exibe sempre (slide_end NULL)
+            $SlideEnd = trim((string) ($PostData['slide_end'] ?? ''));
+            $SlideEndDate = ('' !== $SlideEnd ? Check::data($SlideEnd) : null);
+            $SlideStartDate = Check::data((string) ($PostData['slide_start'] ?? ''));
+            // Link do banner é opcional (vazio = sem link)
+            $SlideLinkBanner = trim((string) ($PostData['slide_link_banner'] ?? ''));
+            unset($PostData['slide_link_banner']);
             $imageMobile = (!empty($_FILES['slide_image_mobile']) ? $_FILES['slide_image_mobile'] : null);
             $imageTablet = (!empty($_FILES['slide_image_tablet']) ? $_FILES['slide_image_tablet'] : null);
             $imageDesktop = (!empty($_FILES['slide_image_desktop']) ? $_FILES['slide_image_desktop'] : null);
 
-            unset($PostData['slide_id'], $PostData['slide_end'], $PostData['slide_image_mobile'], $PostData['slide_image_tablet'], $PostData['slide_image_desktop']);
+            unset($PostData['public'], $PostData['slide_id'], $PostData['slide_end'], $PostData['slide_image_mobile'], $PostData['slide_image_tablet'], $PostData['slide_image_desktop']);
             $Read->fullRead("SELECT slide_image_mobile, slide_image_tablet, slide_image_desktop FROM " . DB_SLIDES . " WHERE slide_id = :id", "id={$SlideId}");
 
             if (empty($imageDesktop) && (!$Read->getResult() || !$Read->getResult()[0]['slide_image_desktop'])) {
                 $jSON['trigger'] = Check::ajaxErro('<b class="icon-warning">ERRO AO CADASTRAR:</b> Favor envie uma imagem de destaque para <b>DESKTOP</b> nas medidas de ' . SLIDE_W . 'x' . SLIDE_H . 'px!', E_USER_ERROR);
 
-            } elseif (in_array('', $PostData)) {
+            } elseif (in_array('', array_map(static fn ($value): string => trim((string) $value), $PostData), true)) {
                 $jSON['trigger'] = Check::ajaxErro('<b class="icon-warning">ERRO AO CADASTRAR:</b> Para atualizar o destaque, favor preencha todos os campos!', E_USER_ERROR);
+                $jSON['error'] = true;
+            } elseif (!$SlideStartDate || ('' !== $SlideEnd && !$SlideEndDate)) {
+                $jSON['trigger'] = Check::ajaxErro('<b class="icon-warning">ERRO AO CADASTRAR:</b> Informe as datas no formato dd/mm/aaaa hh:mm. Deixe a data final vazia para exibir sempre!', E_USER_ERROR);
+                $jSON['error'] = true;
+            } elseif ($SlideEndDate && strtotime($SlideEndDate) <= strtotime($SlideStartDate)) {
+                $jSON['trigger'] = Check::ajaxErro('<b class="icon-warning">ERRO AO CADASTRAR:</b> A data final deve ser depois da data de início. Deixe vazia para exibir sempre!', E_USER_ERROR);
                 $jSON['error'] = true;
             } else {
                 $PostData['slide_date'] = date('Y-m-d H:i:s');
-                $PostData['slide_start'] = Check::data($PostData['slide_start']);
-                $PostData['slide_end'] = (!empty($SlideEnd) ? Check::data($SlideEnd) : null);
+                $PostData['slide_start'] = $SlideStartDate;
+                $PostData['slide_end'] = $SlideEndDate;
+                $PostData['slide_link_banner'] = ('' !== $SlideLinkBanner ? $SlideLinkBanner : null);
 
                 $PostData['show_title'] = (!empty($PostData['show_title']) ? $PostData['show_title'] : '0');
                 $PostData['show_desc'] = (!empty($PostData['show_desc']) ? $PostData['show_desc'] : '0');
@@ -108,7 +121,12 @@ if ($PostData && $PostData['callback_action'] && $PostData['callback'] == $CallB
                 }
 
                 $Update->exeUpdate(DB_SLIDES, $PostData, "WHERE slide_id = :id", "id={$SlideId}");
-                $jSON['trigger'] = Check::ajaxErro("<b class='icon-checkmark'>Tudo certo {$_SESSION['userLogin']['user_name']}</b>: O conteúdo em destaque foi atualizado com sucesso. E sera exibido nas datas cadastradas!");
+                if ($Update->getResult()) {
+                    $jSON['trigger'] = Check::ajaxErro("<b class='icon-checkmark'>Tudo certo {$_SESSION['userLogin']['user_name']}</b>: O conteúdo em destaque foi atualizado com sucesso. E sera exibido " . ($SlideEndDate ? 'até ' . date('d/m/Y \à\s H\hi', strtotime($SlideEndDate)) : 'sempre, sem data final') . '!');
+                } else {
+                    $jSON['trigger'] = Check::ajaxErro('<b class="icon-warning">ERRO AO CADASTRAR:</b> Não foi possível salvar o destaque. Tente novamente!', E_USER_ERROR);
+                    $jSON['error'] = true;
+                }
             }
             break;
 

@@ -71,7 +71,7 @@ if (!$Read->getResult()) {
     $Paginator->returnPage();
     echo Check::erro(
         \sprintf(
-            "<span class='al_center icon-notification'>Ainda não existem páginas cadastrados %s. Comece agora mesmo criando sua primeira página!</span>",
+            "Ainda não existem páginas cadastrados %s. Comece agora mesmo criando sua primeira página!",
             $Admin['user_name']
         ),
         E_USER_NOTICE

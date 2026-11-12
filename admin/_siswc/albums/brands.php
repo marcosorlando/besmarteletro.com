@@ -45,7 +45,7 @@ if (DB_AUTO_TRASH !== 0) {
 if (!$Read->getResult()) {
     echo Check::erro(
         \sprintf(
-            "<span class='al_center icon-notification'>Ainda não existem marcas ou fabricantes cadastradas %s. Comece agora mesmo criando suas marcas e fabricantes de produtos!</span>",
+            "Ainda não existem marcas ou fabricantes cadastradas %s. Comece agora mesmo criando suas marcas e fabricantes de produtos!",
             $Admin['user_name']
         ),
         E_USER_NOTICE

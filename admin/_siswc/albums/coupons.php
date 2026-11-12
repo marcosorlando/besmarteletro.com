@@ -55,7 +55,7 @@ if (!$Read->getResult()) {
     $Pager->returnPage();
     echo Check::erro(
         \sprintf(
-            "<span class='al_center icon-notification'>Ainda não existem cupons de desconto cadastrados %s. Comece agora mesmo criando uma nova oferta e aumente suas conversões!</span>",
+            "Ainda não existem cupons de desconto cadastrados %s. Comece agora mesmo criando uma nova oferta e aumente suas conversões!",
             $Admin['user_name']
         ),
         E_USER_NOTICE

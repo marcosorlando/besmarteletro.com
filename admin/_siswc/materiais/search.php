@@ -64,7 +64,7 @@ $ThisSearch = Check::safeUrlEncode($GetSearch);
         $Paginator->returnPage();
         echo Check::erro(
             sprintf(
-                "<span class='al_center icon-notification'>Olá %s. Sua pesquisa para %s não obteve resultados. Você pode tentar outros termos!</span>",
+                "Olá %s. Sua pesquisa para %s não obteve resultados. Você pode tentar outros termos!",
                 $Admin['user_name'],
                 $ThisSearch
             ),
