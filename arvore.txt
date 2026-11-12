@@ -1,5 +1,8 @@
 besmarteletro.com
+├── .claude
+│   └── settings.local.json
 ├── .git
+├── .idea
 ├── _api
 ├── _app
 │   ├── Bootstrap
@@ -39,6 +42,13 @@ besmarteletro.com
 │   └── Config.inc.php
 ├── _cdn
 │   ├── bootcss
+│   │   ├── font-awesome
+│   │   │   ├── fontawesome-webfont.eot
+│   │   │   ├── fontawesome-webfont.svg
+│   │   │   ├── fontawesome-webfont.ttf
+│   │   │   ├── fontawesome-webfont.woff
+│   │   │   ├── fontawesome-webfont.woff2
+│   │   │   └── FontAwesome.otf
 │   │   ├── fonts
 │   │   │   ├── icomoon.eot
 │   │   │   ├── icomoon.svg
@@ -65,6 +75,10 @@ besmarteletro.com
 │   │   │   ├── pay_credit_card.png
 │   │   │   ├── pay_paypal.png
 │   │   │   └── privace.png
+│   │   ├── font-awesome-animation.css
+│   │   ├── font-awesome-animation.min.css
+│   │   ├── font-awesome.css
+│   │   ├── font-awesome.min.css
 │   │   ├── fonticon.css
 │   │   ├── fonticon.min.css
 │   │   ├── reset.css
@@ -72,8 +86,6 @@ besmarteletro.com
 │   ├── datepicker
 │   │   ├── datepicker.min.css
 │   │   ├── datepicker.min.js
-│   │   ├── datepicker.min.min.css
-│   │   ├── datepicker.min.min.js
 │   │   ├── datepicker.pt-BR.js
 │   │   └── datepicker.pt-BR.min.js
 │   ├── gtranslate
@@ -208,6 +220,13 @@ besmarteletro.com
 │   │   │   ├── contact.wc.min.css
 │   │   │   ├── contact.wc.min.js
 │   │   │   └── contact.wc.php
+│   │   ├── filter
+│   │   │   ├── filter.ajax.php
+│   │   │   ├── filter.css
+│   │   │   ├── filter.js
+│   │   │   ├── filter.min.css
+│   │   │   ├── filter.min.js
+│   │   │   └── filter.php
 │   │   ├── hellobar
 │   │   │   ├── hellobar.ajax.php
 │   │   │   ├── hellobar.wc.css
@@ -242,8 +261,6 @@ besmarteletro.com
 │   │       ├── slide.wc.js
 │   │       ├── slide.wc.min.css
 │   │       ├── slide.wc.min.js
-│   │       ├── slide.wc.min.min.css
-│   │       ├── slide.wc.min.min.js
 │   │       └── slide.wc.php
 │   ├── cronjob.php
 │   ├── highcharts.js
@@ -252,15 +269,27 @@ besmarteletro.com
 │   ├── highlight.min.js
 │   ├── html5shiv.js
 │   ├── html5shiv.min.js
+│   ├── jquery-ui.css
+│   ├── jquery-ui.js
+│   ├── jquery-ui.min.css
+│   ├── jquery-ui.min.js
 │   ├── jquery.form.js
 │   ├── jquery.form.min.js
 │   ├── jquery.js
 │   ├── jquery.min.js
 │   ├── jquery.mobile.js
 │   ├── jquery.mobile.min.js
+│   ├── jquery.zoom.min.js
+│   ├── jspdf.js
 │   ├── jspdf.min.js
 │   ├── maskinput.js
 │   ├── maskinput.min.js
+│   ├── owl.carousel.css
+│   ├── owl.carousel.js
+│   ├── owl.carousel.min.css
+│   ├── owl.carousel.min.js
+│   ├── owl.theme.default.css
+│   ├── owl.theme.default.min.css
 │   ├── text.control.js
 │   ├── text.control.min.js
 │   ├── wc_track.php
@@ -326,6 +355,7 @@ besmarteletro.com
 │   │   ├── ead_certification.png
 │   │   ├── ead_certification_mockup.zip
 │   │   ├── favicon.png
+│   │   ├── list-style.svg
 │   │   ├── load.gif
 │   │   ├── load_w.gif
 │   │   ├── mail.jpg
@@ -490,9 +520,12 @@ besmarteletro.com
 ├── themes
 ├── uploads
 ├── vendor
+├── .gitignore
 ├── .htaccess
+├── arvore.txt
 ├── arvore.txt.
 ├── CHANGELOG.md
+├── commit-msg.txt
 ├── composer.json
 ├── composer.lock
 ├── composer.phar
@@ -512,6 +545,5 @@ besmarteletro.com
 ├── sitemap.xml
 ├── sitemap.xml.gz
 ├── sitemap.xsl
-├── tim.old.php
 ├── tim.php
 └── UPGRADE.md

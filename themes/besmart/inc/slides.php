@@ -4,6 +4,23 @@
 		"status=1");
 
 	if ($Read->getResult()) {
+		// WebP redimensionado pelo tim.php + largura/altura reais do arquivo (reserva o espaço e evita CLS)
+		$slideSize = static function (string $file): array {
+			$size = @getimagesize(dirname(__DIR__, 3) . '/uploads/' . $file);
+
+			return $size ? [$size[0], $size[1]] : [1920, 600];
+		};
+		$slideSrcset = static function (string $file, int $width, array $steps): string {
+			$widths = array_unique(array_merge(array_filter($steps, static fn (int $w): bool => $w < $width), [$width]));
+
+			return implode(', ', array_map(
+				static fn (int $w): string => BASE . "/tim.php?src=uploads/{$file}&w={$w}&fit=max&fm=webp&q=80 {$w}w",
+				$widths
+			));
+		};
+		// Título do admin vem com <br>: vira espaço no alt/title
+		$slideAlt = static fn (string $title): string => htmlspecialchars(trim(preg_replace('~\s+~', ' ', strip_tags(preg_replace('~<\/?br\s*\/?>~i', ' ', $title)))), ENT_QUOTES);
+		$slideIndex = 0;
 
 		?>
 		<section class="carousel container">
@@ -14,20 +31,28 @@
 							$image_desktop = $SLIDE['slide_image_desktop'];
 							$image_mobile = (!empty($SLIDE['slide_image_mobile']) ? $SLIDE['slide_image_mobile'] : $image_desktop);
 							$image_tablet = (!empty($SLIDE['slide_image_tablet']) ? $SLIDE['slide_image_tablet'] : $image_desktop);
+							[$desktopW, $desktopH] = $slideSize($image_desktop);
+							[$tabletW, $tabletH] = $slideSize($image_tablet);
+							[$mobileW, $mobileH] = $slideSize($image_mobile);
+							// Só o primeiro slide aparece na primeira pintura: é o candidato a LCP
+							$slidePriority = (0 === $slideIndex++ ? ' fetchpriority="high"' : '');
 							?>
 							<div>
 								<a href="<?= $SLIDE['slide_link_banner'] ? $SLIDE['slide_link_banner'] : '#'; ?>"
-								   title="<?= $SLIDE['slide_title']; ?>">
-									<picture alt="<?= $SLIDE['slide_title']; ?>">
-										<source media="(min-width: 992px)"
-										        srcset="<?= BASE; ?>/uploads/<?= $image_desktop; ?>"/>
-										<source media="(min-width: 468px)"
-										        srcset="<?= BASE; ?>/uploads/<?= $image_tablet; ?>"/>
-										<source media="(min-width: 1px)"
-										        srcset="<?= BASE; ?>/uploads/<?= $image_mobile; ?>"/>
+								   title="<?= $slideAlt($SLIDE['slide_title']); ?>">
+									<picture>
+										<source media="(min-width: 992px)" sizes="100vw"
+										        width="<?= $desktopW; ?>" height="<?= $desktopH; ?>"
+										        srcset="<?= $slideSrcset($image_desktop, $desktopW, [1366, 1600]); ?>"/>
+										<source media="(min-width: 468px)" sizes="100vw"
+										        width="<?= $tabletW; ?>" height="<?= $tabletH; ?>"
+										        srcset="<?= $slideSrcset($image_tablet, $tabletW, [768]); ?>"/>
+										<source media="(min-width: 1px)" sizes="100vw"
+										        width="<?= $mobileW; ?>" height="<?= $mobileH; ?>"
+										        srcset="<?= $slideSrcset($image_mobile, $mobileW, [480]); ?>"/>
 										<img src="<?= BASE; ?>/uploads/<?= $image_desktop; ?>"
-										     alt="<?= $SLIDE['slide_title']; ?>" title="<?= $SLIDE['slide_title']; ?>"/>
-
+										     width="<?= $desktopW; ?>" height="<?= $desktopH; ?>"<?= $slidePriority; ?>
+										     decoding="async" alt="<?= $slideAlt($SLIDE['slide_title']); ?>"/>
 									</picture>
 								</a>
 

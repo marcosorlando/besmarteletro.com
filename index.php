@@ -1,10 +1,9 @@
 <?php
 
     require_once __DIR__ . '/vendor/autoload.php';
-    //@todo Something REMOVER ou comentar DEPOIS DE ATUALIZAR
+    // Erros na tela só com APP_DEBUG=true (.env); em produção vão para o log do PHP
     error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    // REMOVER ou comentar DEPOIS DE ATUALIZAR
+    ini_set('display_errors', APP_DEBUG ? '1' : '0');
 
     ini_set('allow_url_fopen', 'On');
     ob_start();
@@ -107,7 +106,7 @@
 			<meta charset="UTF-8">
 			<meta name="mit" content="2017-11-16T11:05:36-02:00+24186">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-			<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,user-scalable=0">
+			<meta name="viewport" content="width=device-width,initial-scale=1">
 			<meta property="fb:pages" content="#"/>
 			<title><?= $SEO->getTitle(); ?></title>
 			<meta name="description" content="<?= $SEO->getDescription(); ?>"/>
@@ -198,20 +197,26 @@
 			<link rel="apple-touch-icon" sizes="114x114"
 			      href="<?= $_SESSION['INCLUDE_PATH']; ?>/images/icons/apple-touch-icon-114x114.png">
 
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/bootcss/reset.min.css"/>
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/bootcss/fonticon.min.css"/>
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/bootcss/font-awesome.min.css"/>
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/bootcss/font-awesome-animation.min.css"/>
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/owl.carousel.min.css"/>
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/owl.theme.default.min.css"/>
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/jquery-ui.min.css"/>
-			<link rel="stylesheet" href="<?= BASE; ?>/_cdn/widgets/filter/filter.css"/>
+            <?php
+                // URL com a data do arquivo (?v=): o .htaccess guarda CSS/JS em cache por 1 ano e a URL muda a cada deploy
+                $wcAsset = static fn(string $file): string => BASE . '/' . $file . (is_file(
+                        __DIR__ . '/' . $file
+                    ) ? '?v=' . filemtime(__DIR__ . '/' . $file) : '');
+            ?>
+			<link rel="stylesheet" href="<?= $wcAsset('_cdn/bootcss/reset.min.css'); ?>"/>
+			<link rel="stylesheet" href="<?= $wcAsset('_cdn/bootcss/fonticon.min.css'); ?>"/>
+			<link rel="stylesheet" href="<?= $wcAsset('_cdn/bootcss/font-awesome.min.css'); ?>"/>
+			<link rel="stylesheet" href="<?= $wcAsset('_cdn/bootcss/font-awesome-animation.min.css'); ?>"/>
+			<link rel="stylesheet" href="<?= $wcAsset('_cdn/owl.carousel.min.css'); ?>"/>
+			<link rel="stylesheet" href="<?= $wcAsset('_cdn/owl.theme.default.min.css'); ?>"/>
+			<link rel="stylesheet" href="<?= $wcAsset('_cdn/jquery-ui.min.css'); ?>"/>
+			<link rel="stylesheet" href="<?= $wcAsset('_cdn/widgets/filter/filter.min.css'); ?>"/>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"/>
 
-			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/style.css'/>
-			<link rel='stylesheet' href='<?= INCLUDE_PATH; ?>/_css/responsive.min.css'/>
+			<link rel='stylesheet' href='<?= $wcAsset('themes/' . THEME . '/style.min.css'); ?>'/>
+			<link rel='stylesheet' href='<?= $wcAsset('themes/' . THEME . '/_css/responsive.min.css'); ?>'/>
 
-			<script src="<?= BASE; ?>/_cdn/jquery.js"></script>
+			<script src="<?= $wcAsset('_cdn/jquery.js'); ?>"></script>
 
 			<!-- Facebook Pixel Code -->
             <?php
@@ -553,11 +558,11 @@
         }*/
         ?>
 
-		<script src='<?= BASE; ?>/_cdn/workcontrol.min.js'></script>
-		<script src='<?= BASE; ?>/_cdn/owl.carousel.min.js'></script>
-		<script src='<?= BASE; ?>/_cdn/jquery-ui.min.js'></script>
-		<script src='<?= BASE; ?>/_cdn/jquery.zoom.min.js'></script>
-		<script src='<?= BASE; ?>/_cdn/widgets/filter/filter.min.js'></script>
+		<script src='<?= $wcAsset('_cdn/workcontrol.min.js'); ?>'></script>
+		<script src='<?= $wcAsset('_cdn/owl.carousel.min.js'); ?>'></script>
+		<script src='<?= $wcAsset('_cdn/jquery-ui.min.js'); ?>'></script>
+		<script src='<?= $wcAsset('_cdn/jquery.zoom.min.js'); ?>'></script>
+		<script src='<?= $wcAsset('_cdn/widgets/filter/filter.min.js'); ?>'></script>
 
         <?php
             // WC THEME JS FILES | cada script uma única vez: usa o .min.js quando existir, senão o .js
@@ -573,12 +578,14 @@
                     }
                 }
                 foreach ($wcJsThemeLoad as $wcJsThemeFiles) {
-                    echo '<script src="' . $_SESSION['INCLUDE_PATH'] . '/_js/' . $wcJsThemeFiles . '"></script>' . "\r\n";
+                    echo '<script src="' . $wcAsset(
+                            'themes/' . THEME . '/_js/' . $wcJsThemeFiles
+                        ) . '"></script>' . "\r\n";
                 }
             }
             // MAIN SCRIPT THEME
             if (file_exists('themes/' . THEME . '/scripts.js')) {
-                echo '<script src="' . $_SESSION['INCLUDE_PATH'] . '/scripts.min.js"></script>' . "\r\n";
+                echo '<script src="' . $wcAsset('themes/' . THEME . '/scripts.min.js') . '"></script>' . "\r\n";
             }
         ?>
 		<!--ACCESS-->

@@ -1,14 +1,13 @@
 <?php
 
-// REMOVER DEPOIS DE ATUALIZAR
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 ob_start();
 session_start();
 
 require_once __DIR__ . '/../vendor/autoload.php';
+// Erros na tela só com APP_DEBUG=true (.env); em produção vão para o log do PHP
+ini_set('display_errors', APP_DEBUG ? '1' : '0');
 
 if (isset($_SESSION['userLogin'], $_SESSION['userLogin']['user_level']) && $_SESSION['userLogin']['user_level'] >= 6) {
     header('Location: dashboard.php?wc=home');

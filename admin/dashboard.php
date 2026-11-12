@@ -1,13 +1,13 @@
 <?php
 
-// @todo REMOVER DEPOIS DE ATUALIZAR
     error_reporting(E_ALL);
-    ini_set('display_errors', 1);
 
     ob_start();
     session_start();
 
     require_once __DIR__ . '/../vendor/autoload.php';
+    // Erros na tela só com APP_DEBUG=true (.env); em produção vão para o log do PHP
+    ini_set('display_errors', APP_DEBUG ? '1' : '0');
     require_once __DIR__ . '/../_cdn/cronjob.php';
     mb_internal_encoding('UTF-8');
 

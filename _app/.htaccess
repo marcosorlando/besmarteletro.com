@@ -1,0 +1,9 @@
+# Pasta interna: só é usada via include do PHP, nunca acessada pelo navegador
+# (protege _app/Config/.env com as credenciais do banco/e-mail)
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

@@ -14,7 +14,7 @@ if (!defined('ACC_TAG')) {
 }
 
 if (!defined('ADMIN_DESC')) {
-    define('ADMIN_DESC', 'Descrição do Painel de Controle');
+    define('ADMIN_DESC', 'Sistema de Gerenciamento de Conteúdo mantido pela Zen Agência Web');
 }
 
 if (!defined('ADMIN_MAINTENANCE')) {
@@ -26,7 +26,7 @@ if (!defined('ADMIN_MODE')) {
 }
 
 if (!defined('ADMIN_NAME')) {
-    define('ADMIN_NAME', 'Nome do CMS - Painel de Controle');
+    define('ADMIN_NAME', 'ZEN CONTROL CMS - Painel de Controle');
 }
 
 if (!defined('ADMIN_VERSION')) {
@@ -81,10 +81,6 @@ if (!defined('AGENCY_ZIP')) {
     define('AGENCY_ZIP', '95084-220');
 }
 
-if (!defined('APP_ABOUTPAGE')) {
-    define('APP_ABOUTPAGE', 0);
-}
-
 if (!defined('APP_ALBUMS')) {
     define('APP_ALBUMS', 0);
 }
@@ -125,12 +121,12 @@ if (!defined('APP_HELLO')) {
     define('APP_HELLO', 0);
 }
 
-if (!defined('APP_HOMEPAGE')) {
-    define('APP_HOMEPAGE', 0);
-}
-
 if (!defined('APP_LANDING_PAGES')) {
     define('APP_LANDING_PAGES', 0);
+}
+
+if (!defined('APP_LANG')) {
+    define('APP_LANG', 'pt_BR');
 }
 
 if (!defined('APP_LEADS')) {
@@ -155,10 +151,6 @@ if (!defined('APP_LINK_PRODUCTS')) {
 
 if (!defined('APP_LINK_PROPERTIES')) {
     define('APP_LINK_PROPERTIES', 1);
-}
-
-if (!defined('APP_LOCALE')) {
-    define('APP_LOCALE', 'pt_BR');
 }
 
 if (!defined('APP_LOCALHOST')) {
@@ -201,10 +193,6 @@ if (!defined('APP_POSTS_INSTANT_ARTICLE')) {
     define('APP_POSTS_INSTANT_ARTICLE', 0);
 }
 
-if (!defined('APP_PROJETOS')) {
-    define('APP_PROJETOS', 0);
-}
-
 if (!defined('APP_REPRESENTATIVES')) {
     define('APP_REPRESENTATIVES', 0);
 }
@@ -219,10 +207,6 @@ if (!defined('APP_SEGMENTS')) {
 
 if (!defined('APP_SERVICES')) {
     define('APP_SERVICES', 0);
-}
-
-if (!defined('APP_SKILLSPAGE')) {
-    define('APP_SKILLSPAGE', 0);
 }
 
 if (!defined('APP_SLIDE')) {

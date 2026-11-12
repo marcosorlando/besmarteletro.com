@@ -1,3 +1,74 @@
+/*
+OWL ANTES DO JS
+O owl.carousel.css deixa o carrossel em display:none até o script iniciar. No carregamento frio
+a página pintava sem os carrosséis e o "Quem somos" saltava ~800px quando eles surgiam (CLS 0,42).
+Aqui os itens já ocupam o lugar final, com as mesmas quantidades/margens do responsive em scripts.js.
+Fica no topo do arquivo para manter a mesma ordem de cascata da regra .owl-carousel .owl-item img.
+*/
+:is(.carousel, .products, .options) .owl-carousel:not(.owl-loaded) {
+    display: flex;
+    overflow: hidden;
+    --owl-items: 1;
+    --owl-margin: 0px;
+}
+
+:is(.carousel, .products, .options) .owl-carousel:not(.owl-loaded) > * {
+    position: relative; /* igual ao .owl-item: o texto absoluto do slide fica dentro do próprio item */
+    flex: 0 0 calc(100% / var(--owl-items) - var(--owl-margin));
+    min-width: 0;
+    margin-right: var(--owl-margin);
+}
+
+.owl-carousel:not(.owl-loaded) img {
+    display: block;
+    width: 100%;
+}
+
+.options .owl-carousel:not(.owl-loaded) {
+    --owl-items: 2;
+    --owl-margin: 10px;
+}
+
+@media (min-width: 550px) {
+    .products .owl-carousel:not(.owl-loaded) { --owl-items: 2; --owl-margin: 5px; }
+    .options .owl-carousel:not(.owl-loaded) { --owl-items: 3; }
+}
+
+@media (min-width: 650px) {
+    .products .owl-carousel:not(.owl-loaded) { --owl-margin: 40px; }
+}
+
+@media (min-width: 700px) {
+    .options .owl-carousel:not(.owl-loaded) { --owl-items: 4; }
+}
+
+@media (min-width: 850px) {
+    .products .owl-carousel:not(.owl-loaded) { --owl-items: 3; --owl-margin: 10px; }
+    .options .owl-carousel:not(.owl-loaded) { --owl-items: 5; }
+}
+
+@media (min-width: 1000px) {
+    .options .owl-carousel:not(.owl-loaded) { --owl-items: 6; }
+}
+
+@media (min-width: 1150px) {
+    .options .owl-carousel:not(.owl-loaded) { --owl-items: 7; }
+}
+
+@media (min-width: 1300px) {
+    .options .owl-carousel:not(.owl-loaded) { --owl-items: 8; }
+}
+
+@media (min-width: 1600px) {
+    .products .owl-carousel:not(.owl-loaded) { --owl-items: 4; }
+}
+
+/* width/height no HTML reservam o espaço; height:auto mantém a proporção quando a largura vem do CSS */
+.carousel picture img,
+.about .image img {
+    height: auto;
+}
+
 /* GERAL */
 body {
     padding-top: 0px;
@@ -1089,13 +1160,18 @@ HEADER
     position: relative;
 }
 
+/* texto branco: o verde da marca sobre o cinza da faixa dava contraste 2,2:1; o ícone segue verde */
 .header_whatsapp a {
-    color: var(--color-text-four);
+    color: #ffffff;
     text-decoration: none;
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
     font-size: 1.3rem;
+}
+
+.header_whatsapp a .fa {
+    color: var(--color-text-four);
 }
 
 .header_whatsapp a i {
@@ -2043,7 +2119,8 @@ PRODUCTS
     text-decoration: none;
 }
 
-.products_item h3 {
+.products_item h3,
+.products_item .products_item_name {
     padding: 10px 15px;
     margin-bottom: 0;
     text-transform: uppercase;
@@ -3549,7 +3626,8 @@ ABOUT
 */
 
 .about {
-    background-color: var(--color-background-two);
+    /* cinza do preset escurecido 30%: texto branco sobre #b2b2b2 dava contraste 2,1:1 (mínimo 3:1) */
+    background-color: color-mix(in srgb, var(--color-background-two) 70%, #000000);
     padding: 40px 0 0 0;
     overflow-y: auto;
 }

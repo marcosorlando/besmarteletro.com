@@ -47,6 +47,10 @@ $rawSrc = (string)(filter_input(INPUT_GET, 'src', FILTER_SANITIZE_URL) ?? '');
 $width = filter_input(INPUT_GET, 'w', FILTER_VALIDATE_INT) ?: null;
 $height = filter_input(INPUT_GET, 'h', FILTER_VALIDATE_INT) ?: null;
 $fit = filter_input(INPUT_GET, 'fit', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: 'crop';
+// Formato e qualidade em lista fechada: cada combinação gera um arquivo novo no cache
+$format = filter_input(INPUT_GET, 'fm', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: null;
+$format = in_array($format, ['webp', 'jpg', 'png', 'avif'], true) ? $format : null;
+$quality = filter_input(INPUT_GET, 'q', FILTER_VALIDATE_INT, ['options' => ['min_range' => 40, 'max_range' => 90]]) ?: null;
 
 // Sanitização
 $rawSrc = str_replace(['..\\', '../', '\..'], '', $rawSrc);
@@ -125,6 +129,8 @@ $params = array_filter([
     'w' => $width,
     'h' => $height,
     'fit' => $fit, // crop|max|fill|contain
+    'fm' => $format,
+    'q' => $quality,
 ], fn($v) => null !== $v);
 
 // Entrega

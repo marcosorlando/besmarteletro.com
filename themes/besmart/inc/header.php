@@ -56,7 +56,7 @@
 				<form class="one_input j_search" name="search" method="post" action="" enctype="multipart/form-data">
 					<input class="one_input_field" type="search" name="s" placeholder="O que você está procurando?"
 					       autocomplete="off" required="required"/>
-					<button class="one_input_button" type="submit">
+					<button class="one_input_button" type="submit" aria-label="Pesquisar">
 						<i class="fa fa-search"></i>
 					</button>
 					<div class="realtime_search"></div>
@@ -363,7 +363,7 @@
 					      enctype='multipart/form-data'>
 						<input class='one_input_field' type='search' name='s' placeholder='O que você procura?'
 						       autocomplete='off' required='required'/>
-						<button class='one_input_button' type='submit'>
+						<button class='one_input_button' type='submit' aria-label='Pesquisar'>
 							<i class='fa fa-search'></i>
 						</button>
 
